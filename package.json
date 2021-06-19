@@ -1,0 +1,31 @@
+{
+  "name": "",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "gulp run"
+  },
+  "author": "kylehue",
+  "license": "ISC",
+  "dependencies": {
+    "@babel/core": "^7.14.6",
+    "@babel/preset-env": "^7.14.5",
+    "express": "^4.17.1",
+    "gulp": "^4.0.2",
+    "gulp-babel": "^8.0.0",
+    "gulp-cli": "^2.3.0",
+    "gulp-imagemin": "^7.1.0",
+    "gulp-jshint": "^2.1.0",
+    "gulp-minify-html": "^1.0.6",
+    "gulp-nodemon": "^2.5.0",
+    "gulp-uglify": "^3.0.2",
+    "gulp-uglifycss": "^1.1.0",
+    "jshint": "^2.13.0",
+    "nedb": "^1.8.0",
+    "socket.io": "^4.1.2",
+    "socket.io-client": "^4.1.2",
+    "webpack-stream": "^6.1.2"
+  },
+  "devDependencies": {}
+}

@@ -1,0 +1,189 @@
+:root {
+	--white: #fbfeff;
+	--black: #1d1f23;
+	--red: #ff1b41;
+	--dim: #120b11;
+}
+
+::selection {
+	background: var(--red);
+	color: var(--white);
+}
+
+* {
+	padding: 0;
+	margin: 0;
+	outline: 0;
+	border: none;
+	float: left;
+	font-family: "Catamaran", sans-serif;
+	color: var(--black);
+}
+
+button {
+	cursor: pointer;
+	user-select: none;
+	background: var(--red);
+	color: var(--white);
+}
+
+input {
+	padding: 0 2px;
+}
+
+body {
+	background: #000;
+	font-size: 18px;
+	font-weight: 700;
+	overflow: hidden;
+}
+
+div#gameContainer {
+	position: absolute;
+	display: block;
+	width: 100vw;
+	height: 100vh;
+}
+
+div#gameApp {
+	position: absolute;
+	z-index: 1;
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: var(--dim);
+}
+
+div#loginApp, div#registerApp {
+	position: absolute;
+	display: block;
+	margin: auto;
+	padding: 2px 10px;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 70%;
+	max-width: 300px;
+	height: fit-content;
+	max-height: 300px;
+
+	/*Offset*/
+	transform: translateY(-20px);
+}
+
+div.inlineContainer {
+	height: fit-content !important;
+	width: 100%;
+	align-items: center;
+	display: flex;
+}
+
+label.error {
+	display: block;
+	height: fit-content !important;
+	width: fit-content !important;
+	color: red !important;
+	font-weight: 400 !important;
+	font-size: 12px !important;
+	margin-left: 4px !important;
+	user-select: none !important;
+}
+
+div#loginApp *, div#registerApp * {
+	box-sizing: border-box;
+	width: 100%;
+	border-radius: 2px;
+	height: 35px;
+}
+
+div#loginApp label, div#registerApp label {
+	height: fit-content;
+	user-select: none;
+	font-size: 18px;
+	color: var(--white);
+	width:fit-content;
+	line-height: 1;
+	margin-bottom: 4px;
+}
+
+input.block {
+	margin-bottom: 12px;
+	font-size: 16px;
+	font-weight: 700;
+}
+
+button#loginButton, button#registerButton {
+	margin-top: 15px;
+	height: 60px !important;
+	font-weight: 800;
+}
+
+button#loginButton:hover, button#registerButton:hover {
+	filter: brightness(120%);
+	transition-duration: 200ms;
+}
+
+button#loginButton:active, button#registerButton:active {
+	filter: brightness(80%);
+	transition-duration: 50ms;
+}
+
+button#toLogin, button#toRegister {
+	box-sizing: border-box;
+	background: transparent;
+	font-weight: 400 !important;
+	position: relative !important;
+	display: block !important;
+	margin: 30px auto 0 auto !important;
+	left: 0 !important;
+	right: 0 !important;
+	padding: 0px 0px;
+	width: fit-content !important;
+	height: fit-content !important;
+	float: right;
+}
+
+button#toLogin {
+	float: left;
+}
+
+button#toLogin:hover, button#toRegister:hover {
+	color: var(--red);
+	transition-duration: 100ms;
+}
+
+div#loadScreen{
+	position: absolute;
+	z-index: 9999;
+	width: 100vw;
+	height: 100vh;
+	background: var(--dim);
+}
+
+div#loadScreen div#container{
+	position: absolute;
+	display: block;
+	margin: auto;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: fit-content;
+	height: fit-content;
+	pointer-events: none;
+}
+
+div#loadScreen div#container p{
+	font-weight: 800;
+	font-size: 22px;
+	user-select: none;
+	color: var(--white);
+}
+
+canvas#gameCanvas {
+	background: var(--black);
+	z-index: 0;
+	position: absolute;
+	display: block;
+}
