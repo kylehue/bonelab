@@ -12,6 +12,7 @@ const paths = {
 	client: {
 		entry: "src/client/js/app.js",
 		img: "src/client/assets/images/*.*",
+		svg: "src/client/assets/svg/*.*",
 		js: "src/client/**/*.js",
 		css: "src/client/**/*.css",
 		html: "src/client/index.html",
@@ -62,6 +63,11 @@ gulp.task("client:img", function() {
 		.pipe(gulp.dest("dist/client/assets/images/"));
 });
 
+gulp.task("client:svg", function() {
+	return gulp.src([paths.client.svg])
+		.pipe(gulp.dest("dist/client/assets/svg"));
+});
+
 gulp.task("client:html", function() {
 	return gulp.src([paths.client.html])
 		.pipe(htmlminify())
@@ -91,7 +97,7 @@ gulp.task("lib:js", function() {
 		.pipe(gulp.dest("dist/lib/"));
 });
 
-gulp.task("build:client", gulp.series(["client:entry", "client:js", "client:css", "client:img", "client:html"]));
+gulp.task("build:client", gulp.series(["client:entry", "client:js", "client:css", "client:img", "client:svg", "client:html"]));
 
 gulp.task("build:server", gulp.series(["server:js", "server:db"]));
 
