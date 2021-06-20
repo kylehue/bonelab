@@ -33,9 +33,9 @@ const babelConfig = {
 
 gulp.task("client:entry", function() {
 	return gulp.src([paths.client.entry])
-		.pipe(babel(babelConfig))
 		.pipe(jshint())
 		.pipe(jshint.reporter("default"))
+		.pipe(babel(babelConfig))
 		.pipe(webpack(require("./webpack.config.js")))
 		.pipe(jsuglify())
 		.pipe(gulp.dest("dist/client/js/"));
@@ -43,9 +43,9 @@ gulp.task("client:entry", function() {
 
 gulp.task("client:js", function() {
 	return gulp.src([paths.client.js, `!${paths.client.entry}`])
-		.pipe(babel(babelConfig))
 		.pipe(jshint())
 		.pipe(jshint.reporter("default"))
+		.pipe(babel(babelConfig))
 		.pipe(jsuglify())
 		.pipe(gulp.dest("dist/client/"));
 });
@@ -70,9 +70,9 @@ gulp.task("client:html", function() {
 
 gulp.task("server:js", function() {
 	return gulp.src([paths.server.js])
-		.pipe(babel(babelConfig))
 		.pipe(jshint())
 		.pipe(jshint.reporter("default"))
+		.pipe(babel(babelConfig))
 		.pipe(jsuglify())
 		.pipe(gulp.dest("dist/server/"));
 });
@@ -84,9 +84,9 @@ gulp.task("server:db", function() {
 
 gulp.task("lib:js", function() {
 	return gulp.src([paths.lib.js])
-		.pipe(babel(babelConfig))
 		.pipe(jshint())
 		.pipe(jshint.reporter("default"))
+		.pipe(babel(babelConfig))
 		.pipe(jsuglify())
 		.pipe(gulp.dest("dist/lib/"));
 });

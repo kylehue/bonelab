@@ -69,7 +69,7 @@ div#loginApp, div#registerApp {
 	max-height: 300px;
 
 	/*Offset*/
-	transform: translateY(-20px);
+	transform: translateY(0px);
 }
 
 div.inlineContainer {
