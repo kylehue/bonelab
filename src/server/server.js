@@ -12,6 +12,7 @@ const database = require("./database.js");
 
 //Handle game
 const game = require("./classes/game.js");
+let eventLogs = true;
 
 function toggleOffline(id, value) {
 	database.in("users").update({
@@ -26,7 +27,13 @@ function toggleOffline(id, value) {
 io.on("connection", socket => {
 	console.log(`${socket.id} has connected.`);
 
+	socket.on("client:message:lobby", (name, message) => {
+		if (eventLogs) console.log(`${name} sent ${message}`);
+		io.emit("message:lobby", name, message);
+	});
+
 	socket.on("client:register", (username, password) => {
+		if (eventLogs) console.log(`${username} has registered`);
 		database.in("users").insert({
 			username: username,
 			codename: "",
@@ -47,7 +54,13 @@ io.on("connection", socket => {
 		});
 	});
 
+	socket.on("client:logout", id => {
+		if (eventLogs) console.log(`${id} has logged out`);
+		toggleOffline(id, true);
+	});
+
 	socket.on("client:login", id => {
+		if (eventLogs) console.log(`${id} has logged in`);
 		database.in("users").find({
 			_id: id
 		}, function(er, result) {
@@ -71,6 +84,7 @@ io.on("connection", socket => {
 	});
 
 	socket.on("client:register:validate", (username, password) => {
+		if (eventLogs) console.log(`${username} tried to register`);
 		database.in("users").find({
 			username: username
 		}, function(er, result) {
@@ -83,6 +97,7 @@ io.on("connection", socket => {
 	});
 
 	socket.on("client:login:validate", (username, password) => {
+		if (eventLogs) console.log(`${username} tried to login`);
 		database.in("users").find({
 			username: username
 		}, function(er, result) {
@@ -99,6 +114,7 @@ io.on("connection", socket => {
 	});
 
 	socket.on("client:create:room", (id, roomName) => {
+		if (eventLogs) console.log(`${id} created a room named ${roomName}`);
 		game.createRoom(roomName);
 	});
 

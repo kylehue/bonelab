@@ -2,6 +2,10 @@ class Room {
 	constructor(name) {
 		this.name = name;
 		this.players = [];
+		this.wave = 1;
+		this.maxWave = 50;
+		this.description = "Test";
+		this.number = 1;
 	}
 
 	addPlayer(id) {
