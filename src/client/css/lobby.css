@@ -1,0 +1,337 @@
+:root{
+	--sidebarWidth: 250px;
+	--dim2: #191018;
+	--border: 1px solid #221821;
+}
+
+.glass {
+	background: var(--dim2);
+	border: var(--border);
+	border-radius: 4px;
+	box-shadow: 2px 2px 5px rgba(0,0,0,0.6);
+}
+
+.glass2 {
+	background: #231922;
+	border-radius: 5px;
+	border: 1px solid #292028;
+	box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+}
+
+div#lobbyApp {
+	position: absolute;
+	display: block;
+	margin: auto;
+	padding: 10px 10px;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	box-sizing: border-box;
+}
+
+div#lobbyApp * {
+	color: var(--white);
+}
+
+div#navContainer {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 10vh;
+}
+
+div#navContainer .wrapper {
+	width: 25%;
+	height: 100%;
+	float: left;
+	display: flex;
+	align-items: center;
+	padding: 0 5px;
+	overflow: hidden;
+}
+
+div#navContainer .wrapper * {
+	width: 100%;
+	display: block;
+	margin: auto;
+	box-sizing: border-box;
+}
+
+div#navContainer .wrapper p {
+	width: fit-content;
+}
+
+div#navContainer .wrapper button {
+	height: 50px;
+}
+
+div#roomContainer {
+	position: relative;
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 50vh;
+	overflow: hidden;
+	margin-top: 7px;
+	padding: 10px;
+	box-sizing: border-box;
+}
+
+div#roomContainer #roomListWrapper {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	right: 0;
+	z-index: 0;
+	padding: 5px;
+	box-sizing: border-box;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+div#roomContainer #roomListWrapper .roomWrapper {
+	width: 100%;
+	height: 50px;
+	margin-bottom: 5px;
+	box-sizing: border-box;
+	cursor: pointer;
+	background: rgba(255, 240, 250, 0.01);
+}
+
+div#roomContainer #roomListWrapper .roomWrapper:hover {
+	background: rgba(255, 240, 250, 0.025);
+}
+
+div#roomContainer #roomListWrapper .roomWrapper:active {
+	background: rgba(255, 240, 250, 0.04);
+}
+
+div#roomContainer #roomListWrapper .roomWrapper .roomDetail {
+	width: 25%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	overflow: hidden;
+	box-sizing: border-box;
+	padding: 0 4px;
+	float: left;
+}
+
+div#roomContainer #roomListWrapper .roomWrapper .roomDetail * {
+	user-select: none;
+}
+
+div#roomContainer #roomListWrapper .roomWrapper .roomDetail .content {
+	width: fit-content;
+	height: 50%;
+	display: flex;
+	align-items: center;
+	margin: auto;
+	position: relative;
+}
+
+div#roomContainer #roomListWrapper .roomWrapper .roomDetail p {
+	text-align: center;
+	width: fit-content;
+	height: fit-content;
+	user-select: none;
+	font-weight: 500;
+	font-size: 14px;
+	line-height: 0.8;
+}
+
+div#roomContainer #roomListWrapper .roomWrapper .roomDetail img {
+	width: auto;
+	height: 50%;
+	filter: invert(1) sepia(0.08) brightness(1) saturate(100) hue-rotate(180deg);
+}
+
+div#roomContainer #playerListWrapper{
+	display: block;
+	width: 30%;
+	height: 100%;
+	min-width: var(--sidebarWidth);
+	z-index: 1;
+	position: absolute;
+	margin-left: -10px;
+}
+
+div#roomContainer button#createRoom{
+	position: absolute;
+	right: 25px;
+	bottom: 10px;
+	line-height: 1;
+	padding: 15px 20px;
+	border-radius: 5px;
+}
+
+div#chatContainer {
+	position: relative;
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 33vh;
+	overflow: hidden;
+	margin-top: 7px;
+}
+
+div#chatContainer #friendListWrapper{
+	display: block;
+	width: 30%;
+	height: 100%;
+	min-width: var(--sidebarWidth);
+	z-index: 1;
+}
+
+div#chatContainer #chatWrapper {
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	right: 0;
+	z-index: 0;
+	padding: 10px;
+	box-sizing: border-box;
+}
+
+div#chatWrapper #textAreaWrapper{
+	position: relative;
+	width: 100%;
+	height: calc(80% - 10px);
+	margin-bottom: 10px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+div#chatWrapper #textAreaWrapper *{
+	font-weight: 400 !important;
+	font-size: 14px !important;
+}
+
+div#chatWrapper #textAreaWrapper .messageWrapper{
+	width: 98%;
+	height: fit-content;
+	margin-top: 8px;
+	margin-left: 5px;
+}
+
+div#chatWrapper #textAreaWrapper .messageWrapper p{
+	line-height: 1;
+	user-select: none;
+	height: fit-content;
+	font-size: 1rem;
+}
+
+div#chatWrapper #composeWrapper{
+	position: relative;
+	width: 100%;
+	height: 20%;
+}
+
+div#chatWrapper #composeWrapper input{
+	resize: none;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+	padding: 0 6px;
+	overflow: hidden;
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 1;
+	background: #231922;
+	border-radius: 5px;
+}
+
+button.toggleButton {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	width: 30px;
+	height: 30px;
+}
+
+div#confirmDialogApp {
+	position: absolute;
+	z-index: 9998;
+	margin: auto;
+	display: block;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 70%;
+	max-width: 300px;
+	height: fit-content;
+	min-height: 100px;
+	padding: 5px;
+	box-sizing: border-box;
+}
+
+div#confirmDialogApp #titleWrapper{
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: fit-content;
+	font-size: 18px;
+	font-weight: 700;
+	border-bottom: 1px solid rgba(255, 235, 245, 0.04);
+}
+
+div#confirmDialogApp #titleWrapper p{
+	color: var(--white);
+}
+
+div#confirmDialogApp #descriptionWrapper{
+	display: flex;
+	width: 100%;
+	height: fit-content;
+	font-size: 16px;
+	font-weight: 500;
+	color: var(--white);
+}
+
+div#confirmDialogApp #descriptionWrapper p{
+	color: var(--white);
+}
+
+div#confirmDialogApp #buttonWrapper{
+	display: block;
+	width: 100%;
+	height: fit-content;
+	margin-top: 30px;
+	position: relative;
+}
+
+div#confirmDialogApp #buttonWrapper button{
+	width: calc(50% - 2.5px);
+	height: 50px;
+	margin: auto;
+	display: inline-block;
+	position: relative;
+}
+
+div#confirmDialogApp #buttonWrapper button#dialogProceed{
+	border-radius: 5px;
+}
+
+div#confirmDialogApp #buttonWrapper button#dialogCancel{
+	float: right;
+	background: rgba(250, 250, 250, 0.01);
+}
+
+.hideSidebar {
+	width: 0% !important;
+	min-width: 0px !important;
+	transform: translateX(-5px);
+	transition-duration: 200ms;
+	transition-timing-function: cubic-bezier(0.290, 0.020, 0.015, 1.000);
+}
+
+.showSidebar {
+	width: 30% !important;
+	min-width: var(--sidebarWidth) !important;
+	transition-duration: 200ms;
+	transition-timing-function: cubic-bezier(0.290, 0.020, 0.015, 1.000);
+}

@@ -10,14 +10,41 @@
 	color: var(--white);
 }
 
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #20161f;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2029;
+  border-radius: 10px;
+}
+
 * {
 	padding: 0;
 	margin: 0;
 	outline: 0;
 	border: none;
-	float: left;
 	font-family: "Catamaran", sans-serif;
 	color: var(--black);
+}
+
+::-webkit-scrollbar-thumb:hover {
+	filter: brightness(1.1);
+}
+
+[class^="fa-"], [class*=" fa-"] {
+	color: white;
+	margin: auto;
+	display: block;
+}
+
+img {
+	user-select: none;
 }
 
 button {
@@ -27,7 +54,17 @@ button {
 	color: var(--white);
 }
 
-input {
+button:hover {
+	filter: brightness(120%);
+	transition-duration: 200ms;
+}
+
+button:active {
+	filter: brightness(80%);
+	transition-duration: 50ms;
+}
+
+input, textarea {
 	padding: 0 2px;
 }
 
@@ -119,16 +156,6 @@ button#loginButton, button#registerButton {
 	font-weight: 800;
 }
 
-button#loginButton:hover, button#registerButton:hover {
-	filter: brightness(120%);
-	transition-duration: 200ms;
-}
-
-button#loginButton:active, button#registerButton:active {
-	filter: brightness(80%);
-	transition-duration: 50ms;
-}
-
 button#toLogin, button#toRegister {
 	box-sizing: border-box;
 	background: transparent;
@@ -149,8 +176,8 @@ button#toLogin {
 }
 
 button#toLogin:hover, button#toRegister:hover {
-	color: var(--red);
-	transition-duration: 100ms;
+	color: var(--red) !important;
+	transition-duration: 100ms !important;
 }
 
 div#loadScreen{

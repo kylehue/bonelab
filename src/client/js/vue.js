@@ -1,5 +1,7 @@
 const app = {};
 
+const sessionKey = "RGcPyH2xAtBKokmPMIYEc2lHYQy7joC9";
+
 const messages = {
 	blank: "— This field is required",
 	short: "— Too short",
@@ -13,6 +15,32 @@ function loadScreen() {
 	loginApp.hidden = true;
 	registerApp.hidden = true;
 	loadApp.hidden = false;
+	lobbyApp.hidden = true;
+}
+
+function showLobby() {
+	loginApp.hidden = true;
+	registerApp.hidden = true;
+	loadApp.hidden = true;
+	lobbyApp.hidden = false;
+}
+
+function showHome() {
+	loginApp.hidden = false;
+	registerApp.hidden = true;
+	loadApp.hidden = true;
+	lobbyApp.hidden = true;
+}
+
+function createLobbyMessage(name, message) {
+	let elWrapper = document.createElement("div");
+	elWrapper.classList.add("messageWrapper");
+	let elMessage = document.createElement("p");
+	elMessage.innerText = `${name}: ${message}`;
+	elWrapper.appendChild(elMessage);
+	let parent = document.getElementById("textAreaWrapper");
+	parent.appendChild(elWrapper);
+	parent.scrollTop = parent.scrollHeight;
 }
 
 var loginApp = new Vue({
@@ -143,7 +171,81 @@ var registerApp = new Vue({
 	}
 });
 
+var confirmDialogApp = new Vue({
+	el: "#confirmDialogApp",
+	data: {
+		hidden: true,
+		title: "Title",
+		description: "Description",
+		proceedText: "Accept",
+		cancelText: "Decline"
+	},
+	methods: {
+		proceed: function() {},
+		cancel: function() {},
+		show: function(title, description, proceedText, cancelText, proceedFunction, cancelFunction) {
+			this.title = title;
+			this.description = description;
+			this.proceedText = proceedText;
+			this.cancelText = cancelText;
+			this.hidden = false;
+
+			if (typeof proceedFunction == "function") {
+				this.proceed = proceedFunction;
+			}
+
+			if (typeof cancelFunction == "function") {
+				this.cancel = cancelFunction;
+			}
+		}
+	}
+})
+
+var lobbyApp = new Vue({
+	el: "#lobbyApp",
+	data: {
+		room: {
+			sidebar: "#playerListWrapper",
+			main: "#roomListWrapper"
+		},
+		chat: {
+			sidebar: "#friendListWrapper",
+			main: "#chatWrapper"
+		},
+		hidden: false
+	},
+	methods: {
+		toggleSidebar: function(id) {
+			let el = document.querySelector(id);
+			el.classList.toggle("hideSidebar");
+			el.classList.toggle("showSidebar");
+		},
+		sendChat: function() {
+			let message = composeMessage.value;
+
+			if (!message.length) return;
+
+			composeMessage.value = "";
+			app.client.sendChat(app.client.codename, message);
+		},
+		logout: function() {
+			confirmDialogApp.show("Logout", "Are you sure?", "Yes", "Back", function() {
+				app.client.logout();
+				if (sessionStorage[sessionKey]) delete sessionStorage[sessionKey];
+				confirmDialogApp.hidden = true;
+				showHome();
+			}, function() {
+				confirmDialogApp.hidden = true;
+			});
+		}
+	}
+});
+
 function connectClient() {
+	app.client.socket.on("message:lobby", (name, message) => {
+		createLobbyMessage(name, message);
+	});
+
 	app.client.socket.on("client:register:error", error => {
 		if (error == "duplicate") {
 			registerApp.usernameError = true;
@@ -175,8 +277,26 @@ function connectClient() {
 	});
 
 	app.client.socket.on("client:load", data => {
-		console.log(data);
+		let keys = Object.keys(data);
+		for (let key of keys) {
+			app.client[key] = data[key];
+		}
+
+		sessionStorage.setItem(sessionKey, data.id);
+
+		console.log(app.client);
+		showLobby();
 	});
+
+	//Load session
+	window.onload = function() {
+		if (sessionStorage[sessionKey]) {
+			app.client.login(sessionStorage[sessionKey]);
+		}else{
+			showHome();
+			console.log("Session has expired. Please login again");
+		}
+	}
 }
 
 var loadApp = new Vue({
@@ -186,8 +306,11 @@ var loadApp = new Vue({
 	}
 });
 
+registerApp.hidden = true;
+loginApp.hidden = true;
+
 module.exports = {
-	pass: function(name, value) {
+	set: function(name, value) {
 		app[name] = value;
 		if (name == "client") connectClient();
 	}

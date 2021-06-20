@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Untitled</title>
+		<title>Bonelab</title>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="preconnect" href="https://fonts.gstatic.com">
 		<link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;700;800&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 		<link rel="stylesheet" type="text/css" href="css/main.css">
+		<link rel="stylesheet" type="text/css" href="css/lobby.css">
+
 	</head>
 	<body>
 		<div id="gameContainer">
 			<div id="gameApp">
-				<!-- Splash/Loading -->
+				<!-- Splash screen/Loading -->
 				<div id="loadScreen" v-if="!hidden">
 					<div id="container">
 						<p>Loading...</p>
@@ -60,14 +63,94 @@
 					<button id="toLogin" v-on:click="login">← LOGIN</button>
 				</div>
 
-				<div id="lobbyContainer">
-					
+				<div id="confirmDialogApp" class="glass2" v-if="!hidden">
+					<div id="titleWrapper">
+						<p>{{title}}</p>
+					</div>
+					<div id="descriptionWrapper">
+						<p>{{description}}</p>
+					</div>
+					<div id="buttonWrapper">
+						<button id="dialogProceed" v-on:click="proceed">{{proceedText}}</button>
+						<button id="dialogCancel" class="glass2" v-on:click="cancel">{{cancelText}}</button>
+					</div>
+				</div>
+
+				<!-- Lobby -->
+				<div id="lobbyApp" v-if="!hidden">
+					<!-- Navigation -->
+					<div id="navContainer" class="glass">
+						<div class="wrapper">
+							<p>Bonelab</p>
+						</div>
+						<div class="wrapper">
+							<button id="inventory" class="glass2"><i class="fa fa-archive"></i>Inventory</button>
+						</div>
+						<div class="wrapper">
+							<button id="shop" class="glass2"><i class="fa fa-cart-plus"></i>Shop</button>
+						</div>
+						<div class="wrapper">
+							<button id="logout" class="glass2" v-on:click="logout"><i class="fa fa-sign-out"></i> Logout</button>
+						</div>
+					</div>
+
+					<!-- Rooms -->
+					<div id="roomContainer" class="glass">
+						<div id="playerListWrapper" class="hideSidebar glass2">
+							<button class="toggleButton glass2" v-on:click="toggleSidebar(room.sidebar)"><i class="fa fa-creative-commons-by"></i></button>
+						</div>
+						<div id="roomListWrapper" class="">
+							<!-- rooms -->
+							<div class="roomWrapper glass2">
+								<div class="roomNumber roomDetail">
+									<div class="content">
+										<img src="assets/svg/hash.svg">&nbsp;
+										<p>1</p>
+									</div>
+								</div>
+								<div class="roomDescription roomDetail">
+									<div class="content">
+										<img src="assets/svg/message.svg">&nbsp;
+										<p>test pls join</p>
+									</div>
+								</div>
+								<div class="roomWave roomDetail">
+									<div class="content">
+										<img src="assets/svg/shield-hash.svg">&nbsp;
+										<p>2/100</p>
+									</div>
+								</div>
+								<div class="roomPlayers roomDetail">
+									<div class="content">
+										<img src="assets/svg/person.svg">&nbsp;
+										<p>53/100</p>
+									</div>
+								</div>
+							</div>
+
+						</div>
+						<button id="createRoom"><i class="fa fa-plus"></i>&nbsp;New room</button>
+					</div>
+
+					<!-- Chat -->
+					<div id="chatContainer" class="glass">
+						<div id="friendListWrapper" class="hideSidebar glass2">
+							<button class="toggleButton glass2" v-on:click="toggleSidebar(chat.sidebar)"><i class="fa fa-user-friends"></i></button>
+						</div>
+						<div id="chatWrapper" class="">
+							<div id="textAreaWrapper">
+								<!-- messages goes here -->
+							</div>
+							<div id="composeWrapper">
+								<input id="composeMessage" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" v-on:keydown.enter="sendChat" placeholder="Type here..."></input>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<canvas id="gameCanvas"></canvas>
 		</div>
 		<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
-		<!-- <script src="js/vue.js"></script> -->
 		<script src="js/app.js"></script>
 	</body>
 </html>

@@ -9,6 +9,10 @@ class Client {
 		});
 	}
 
+	sendChat(name, message) {
+		this.socket.emit("client:message:lobby", name, message);
+	}
+
 	validateRegister(username, password) {
 		this.socket.emit("client:register:validate", username, password);
 	}
@@ -21,8 +25,12 @@ class Client {
 		this.socket.emit("client:register", username, password);
 	}
 
-	login(username, password) {
-		this.socket.emit("client:login", username, password);
+	login(id) {
+		this.socket.emit("client:login", id);
+	}
+
+	logout() {
+		this.socket.emit("client:logout", this.id);
 	}
 
 	createRoom(name) {
