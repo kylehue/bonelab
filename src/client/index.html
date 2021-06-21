@@ -27,15 +27,15 @@
 						<label for="username">Username</label>
 						<label for="username" class="error" v-if="usernameError">{{usernameMessage}}</label>
 					</div>
-					<input id="username" class="block" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="0" />
+					<input id="username" class="block" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="1" />
 
 					<div class="inlineContainer">
 						<label for="password">Password</label>
 						<label for="password" class="error" v-if="passwordError">{{passwordMessage}}</label>
 					</div>
-					<input id="password" class="block" type="password" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="1" />
+					<input id="password" class="block" type="password" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" tabindex="2" />
 
-					<button id="loginButton" v-on:click="validate" tabindex="2">LOGIN</button>
+					<button id="loginButton" v-on:click="validate">LOGIN</button>
 					<button id="toRegister" v-on:click="register">REGISTER →</button>
 				</div>
 
@@ -63,16 +63,48 @@
 					<button id="toLogin" v-on:click="login">← LOGIN</button>
 				</div>
 
-				<div id="confirmDialogApp" class="glass2" v-if="!hidden">
-					<div id="titleWrapper">
+				<!-- Overlay -->
+				<div id="overlay" v-if="!hidden"></div>
+
+				<!-- Dialog -->
+				<div id="dialogApp" class="glass2" v-if="!hidden">
+					<div class="titleWrapper">
 						<p>{{title}}</p>
 					</div>
-					<div id="descriptionWrapper">
+					<div class="descriptionWrapper">
 						<p>{{description}}</p>
+						<p class="small red" v-if="!errorHidden">{{error}}</p>
+						<input id="dialogInput" class="glass3" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type here..." v-if="!inputHidden"/>
 					</div>
-					<div id="buttonWrapper">
-						<button id="dialogProceed" v-on:click="proceed">{{proceedText}}</button>
-						<button id="dialogCancel" class="glass2" v-on:click="cancel">{{cancelText}}</button>
+					<div class="buttonWrapper">
+						<button id="dialogProceed" class="" v-on:click="proceed" v-if="!proceedHidden">{{proceedText}}</button>
+						<button id="dialogCancel" class="glass2" v-on:click="cancel" v-if="!cancelHidden">{{cancelText}}</button>
+					</div>
+				</div>
+
+				<!-- New Room -->
+				<div id="roomApp" class="glass2" v-if="!hidden">
+					<div class="headWrapper">
+						<p>Create room</p>
+					</div>
+					<div class="bodyWrapper">
+						<div class="inlineContainer">
+							<label for="roomDescription">Description</label>
+							<label for="roomDescription" class="error" v-if="!descriptionErrorHidden">{{descriptionError}}</label>
+						</div>
+						<input id="roomDescription" class="glass3" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type here..." value="Take over the world!" v-on:keydown="validateDescription"/>
+						<div class="inlineContainer">
+							<label for="roomWaves">Total waves</label>
+							<label for="roomWaves" class="error" v-if="!waveErrorHidden">{{waveError}}</label>
+						</div>
+						<input id="roomWaves" class="glass3" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type here..." value="10" v-on:keydown="validateFormat" v-on:input="validateMax" v-on:focusout="validateMin" v-on:wheel="toggleAmount"/>
+						<label for="roomPassword">Password <span>(Optional)</span></label>
+						<input id="roomPassword" class="glass3" type="text" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type here..."/>
+						<!-- <label for="roomInvite">Invite</label> -->
+						<div class="buttonWrapper">
+							<button id="roomJoin" v-on:click="join">Join</button>
+							<button id="roomClose" class="glass2" v-on:click="close">Close</button>
+						</div>
 					</div>
 				</div>
 
@@ -100,36 +132,9 @@
 							<button class="toggleButton glass2" v-on:click="toggleSidebar(room.sidebar)"><i class="fa fa-creative-commons-by"></i></button>
 						</div>
 						<div id="roomListWrapper" class="">
-							<!-- rooms -->
-							<div class="roomWrapper glass2">
-								<div class="roomNumber roomDetail">
-									<div class="content">
-										<img src="assets/svg/hash.svg">&nbsp;
-										<p>1</p>
-									</div>
-								</div>
-								<div class="roomDescription roomDetail">
-									<div class="content">
-										<img src="assets/svg/message.svg">&nbsp;
-										<p>test pls join</p>
-									</div>
-								</div>
-								<div class="roomWave roomDetail">
-									<div class="content">
-										<img src="assets/svg/shield-hash.svg">&nbsp;
-										<p>2/100</p>
-									</div>
-								</div>
-								<div class="roomPlayers roomDetail">
-									<div class="content">
-										<img src="assets/svg/person.svg">&nbsp;
-										<p>53/100</p>
-									</div>
-								</div>
-							</div>
-
+							<!-- rooms goes here -->
 						</div>
-						<button id="createRoom"><i class="fa fa-plus"></i>&nbsp;New room</button>
+						<button id="createRoom" v-on:click="createRoom"><i class="fa fa-plus"></i>&nbsp;New room</button>
 					</div>
 
 					<!-- Chat -->
@@ -148,7 +153,7 @@
 					</div>
 				</div>
 			</div>
-			<canvas id="gameCanvas"></canvas>
+			<canvas id="gameCanvas" v-if="!hidden"></canvas>
 		</div>
 		<script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
 		<script src="js/app.js"></script>

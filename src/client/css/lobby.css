@@ -18,6 +18,13 @@
 	box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
 }
 
+.glass3 {
+	background: #261d25;
+	border-radius: 5px;
+	color: var(--white);
+	box-shadow: none;
+}
+
 div#lobbyApp {
 	position: absolute;
 	display: block;
@@ -146,7 +153,8 @@ div#roomContainer #roomListWrapper .roomWrapper .roomDetail p {
 div#roomContainer #roomListWrapper .roomWrapper .roomDetail img {
 	width: auto;
 	height: 50%;
-	filter: invert(1) sepia(0.08) brightness(1) saturate(100) hue-rotate(180deg);
+	margin-right: 5px;
+	filter: invert(1) sepia(1) brightness(0.79) saturate(46) hue-rotate(181deg);
 }
 
 div#roomContainer #playerListWrapper{
@@ -252,7 +260,7 @@ button.toggleButton {
 	height: 30px;
 }
 
-div#confirmDialogApp {
+div#dialogApp {
 	position: absolute;
 	z-index: 9998;
 	margin: auto;
@@ -265,46 +273,60 @@ div#confirmDialogApp {
 	max-width: 300px;
 	height: fit-content;
 	min-height: 100px;
-	padding: 5px;
+	padding: 5px 5px 10px 5px;
 	box-sizing: border-box;
 }
 
-div#confirmDialogApp #titleWrapper{
+div#dialogApp .titleWrapper{
 	display: flex;
 	align-items: center;
 	width: 100%;
 	height: fit-content;
 	font-size: 18px;
 	font-weight: 700;
+	padding-bottom: 5px;
 	border-bottom: 1px solid rgba(255, 235, 245, 0.04);
 }
 
-div#confirmDialogApp #titleWrapper p{
+div#dialogApp .titleWrapper p{
 	color: var(--white);
 }
 
-div#confirmDialogApp #descriptionWrapper{
-	display: flex;
+div#dialogApp .descriptionWrapper{
 	width: 100%;
 	height: fit-content;
 	font-size: 16px;
 	font-weight: 500;
 	color: var(--white);
+	box-sizing: border-box;
+	margin-top: 5px;
 }
 
-div#confirmDialogApp #descriptionWrapper p{
+div#dialogApp .descriptionWrapper input{
+	display: block;
+	width: 100%;
+	font-weight: 400;
+	font-size: 16px;
+	line-height: 1;
+	padding: 6px 6px;
+	box-sizing: border-box;
+}
+
+div#dialogApp .descriptionWrapper p{
 	color: var(--white);
+	display: block;
+	width: 100%;
 }
 
-div#confirmDialogApp #buttonWrapper{
+div#dialogApp .buttonWrapper{
 	display: block;
 	width: 100%;
 	height: fit-content;
-	margin-top: 30px;
+	margin-top: 20px;
 	position: relative;
 }
 
-div#confirmDialogApp #buttonWrapper button{
+div#dialogApp .buttonWrapper button{
 	width: calc(50% - 2.5px);
 	height: 50px;
 	margin: auto;
@@ -312,13 +334,123 @@ div#confirmDialogApp #buttonWrapper button{
 	position: relative;
 }
 
-div#confirmDialogApp #buttonWrapper button#dialogProceed{
+div#dialogApp .buttonWrapper button#dialogProceed{
 	border-radius: 5px;
 }
 
-div#confirmDialogApp #buttonWrapper button#dialogCancel{
+div#dialogApp .buttonWrapper button#dialogCancel{
 	float: right;
 	background: rgba(250, 250, 250, 0.01);
+}
+
+div#overlay {
+	position: absolute;
+	z-index: 9997;
+	background: var(--dim);
+	opacity: 0.6;
+	pointer-events: all;
+	user-select: none;
+	width: 100vw;
+	height: 100vh;
+}
+
+div#roomApp {
+	position: absolute;
+	margin: auto;
+	display: block;
+	z-index: 9998;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	width: 70%;
+	max-width: 300px;
+	height: fit-content;
+	min-height: 100px;
+	padding: 0px 5px 10px 5px;
+	box-sizing: border-box;
+}
+
+div#roomApp .headWrapper {
+	width: 100%;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	border-bottom: 1px solid rgba(255, 235, 245, 0.04);
+}
+
+div#roomApp .headWrapper p {
+	color: var(--white);
+	width: fit-content;
+}
+
+div#roomApp .bodyWrapper {
+	width: 100%;
+	height: fit-content;
+}
+
+div#roomApp .bodyWrapper input {
+	width: 100%;
+	padding: 6px 3px;
+	box-sizing: border-box;
+}
+
+div#roomApp .bodyWrapper label {
+	color: var(--white);
+	margin-top: 6px;
+	font-size: 16px !important;
+	font-weight: 500 !important;
+}
+
+div#roomApp .bodyWrapper label[class^="error"] {
+	font-size: 14px !important;
+	font-weight: 400 !important;
+}
+
+div#roomApp .bodyWrapper label[for^="roomPassword"] span {
+	color: rgba(255, 255, 255, 0.1);
+	font-size: 12px !important;
+	font-weight: 400 !important;
+}
+
+div#roomApp .buttonWrapper{
+	display: block;
+	width: 100%;
+	height: fit-content;
+	margin-top: 20px;
+	position: relative;
+}
+
+div#roomApp .buttonWrapper button{
+	width: calc(50% - 2.5px);
+	height: 50px;
+	margin: auto;
+	display: inline-block;
+	position: relative;
+}
+
+div#roomApp .buttonWrapper button#roomJoin{
+	border-radius: 5px;
+}
+
+div#roomApp .buttonWrapper button#roomClose{
+	float: right;
+	background: rgba(250, 250, 250, 0.01);
+}
+
+.small {
+	font-size: 14px !important;
+	font-weight: 400 !important;
+}
+
+.red {
+	color: red !important;
+}
+
+.center {
+	float: none !important;
+	display: block !important;
+	margin: auto !important;
 }
 
 .hideSidebar {

@@ -8,6 +8,8 @@ const client = require("./client.js");
 const vue = require("./vue.js");
 vue.set("client", client);
 
+window.client = client;
+
 renderer.fullscreen();
 renderer.render(function() {
 	

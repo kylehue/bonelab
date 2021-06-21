@@ -1,5 +1,5 @@
 :root {
-	--white: #fbfeff;
+	--white: #e6eef0;
 	--black: #1d1f23;
 	--red: #ff1b41;
 	--dim: #120b11;
@@ -35,6 +35,11 @@
 
 ::-webkit-scrollbar-thumb:hover {
 	filter: brightness(1.1);
+}
+
+::placeholder {
+	color: rgba(255, 240, 247, 0.3);
+	user-select: none;
 }
 
 [class^="fa-"], [class*=" fa-"] {

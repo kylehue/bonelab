@@ -5,7 +5,7 @@ class Client {
 		this.socket = io();
 
 		this.socket.on("connect", () => {
-			
+
 		});
 	}
 
@@ -29,16 +29,26 @@ class Client {
 		this.socket.emit("client:login", id);
 	}
 
+	validateCodename(codename) {
+		this.socket.emit("client:codename:validate", codename);
+	}
+
+	setCodename(codename) {
+		if (!this.id) console.warn("Client ID is not defined");
+		this.socket.emit("client:codename", this.id, codename);
+	}
+
 	logout() {
+		if (!this.id) console.warn("Client ID is not defined");
 		this.socket.emit("client:logout", this.id);
 	}
 
-	createRoom(name) {
-		this.socket.emit("client:create:room", this.socket.id, name);
+	createRoom(description, waves, password) {
+		this.socket.emit("client:create:room", description, waves, password);
 	}
 
-	join(roomName) {
-		this.socket.emit("client:join", this.socket.id, roomName);
+	join(roomId) {
+		this.socket.emit("client:room", roomId);
 	}
 
 	leave() {
