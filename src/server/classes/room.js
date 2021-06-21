@@ -1,17 +1,21 @@
+const uuid = require("uuid");
+const Player = require("./player.js");
+
 class Room {
-	constructor(name) {
-		this.name = name;
+	constructor(index, description, waves, password) {
+		this.id = uuid.v4();
+		this.index = index;
+		this.description = description;
+		this.currentWave = 1;
+		this.password = password;
 		this.players = [];
-		this.wave = 1;
-		this.maxWave = 50;
-		this.description = "Test";
-		this.number = 1;
+		this.maxWave = waves;
 	}
 
 	addPlayer(id) {
-		this.players.push({
-			id: id
-		});
+		let player = Player.create(id);
+		this.players.push(player);
+		return player;
 	}
 
 	removePlayer(id) {
@@ -21,7 +25,7 @@ class Room {
 }
 
 module.exports = {
-	create: function (name) {
-		return new Room(name);
+	create: function (index, description, waves, password) {
+		return new Room(index, description, waves, password);
 	}
 };

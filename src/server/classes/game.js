@@ -5,9 +5,15 @@ class Game {
 		this.rooms = [];
 	}
 
-	createRoom(name) {
-		let room = Room.create(name);
+	createRoom(description, waves, password) {
+		let room = Room.create(this.rooms.length + 1, description, waves, password);
 		this.rooms.push(room);
+		return room;
+	}
+
+	getRoom(id) {
+		let room = this.rooms.find(rm => rm.id == id);
+		return room;
 	}
 }
 

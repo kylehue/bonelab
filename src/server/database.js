@@ -21,15 +21,21 @@ class Database {
 	load(name) {
 		let database = new Datastore(`./server/database/${name}.db`);
 		database.loadDatabase();
-		this.tables.push({
-			name: name,
-			data: database
-		});
+
+		let table = this.tables.find(tb => tb.name == name);
+		if (!table) {
+			this.tables.push({
+				name: name,
+				data: database
+			});
+		}
+
 		return database;
 	}
 
 	in (name) {
 		let table = this.tables.find(tb => tb.name == name);
+		this.load(table.name);
 		return table.data;
 	}
 }

@@ -8,6 +8,8 @@ const server = app.listen(port, () => {
 });
 const io = socket(server);
 app.use(express.static(__dirname + "/../client"));
+
+//
 const database = require("./database.js");
 
 //Handle game
@@ -24,8 +26,34 @@ function toggleOffline(id, value) {
 	});
 }
 
+function updateClientRooms() {
+	io.emit("room:update", game.rooms);
+}
+
 io.on("connection", socket => {
 	console.log(`${socket.id} has connected.`);
+
+	socket.on("client:codename:validate", codename => {
+		database.in("users").find({
+			codename: codename
+		}, function(er, result) {
+			if (result.length) {
+				socket.emit("client:codename:error", "duplicate");
+			} else {
+				socket.emit("client:codename:success", codename);
+			}
+		});
+	})
+
+	socket.on("client:codename", (id, codename) => {
+		database.in("users").update({
+			_id: id
+		}, {
+			$set: {
+				codename: codename
+			}
+		});
+	});
 
 	socket.on("client:message:lobby", (name, message) => {
 		if (eventLogs) console.log(`${name} sent ${message}`);
@@ -78,6 +106,7 @@ io.on("connection", socket => {
 				};
 
 				socket.emit("client:load", loadData);
+				updateClientRooms();
 				toggleOffline(id, false);
 			}
 		});
@@ -113,16 +142,17 @@ io.on("connection", socket => {
 		});
 	});
 
-	socket.on("client:create:room", (id, roomName) => {
-		if (eventLogs) console.log(`${id} created a room named ${roomName}`);
-		game.createRoom(roomName);
+	socket.on("client:room", id => {
+		let room = game.getRoom(id);
+		let player = room.addPlayer(socket.id);
+		socket.join(id);
+		io.in(room.id).emit("client:game", player);
+		socket.emit("client:room:enter");
 	});
 
-	socket.on("client:join", (id, roomName) => {
-
-	});
-
-	socket.on("client:leave", (id, roomName) => {
-
+	socket.on("client:create:room", (description, waves, password) => {
+		let room = game.createRoom(description, waves, password);
+		socket.emit("client:join", room.id);
+		updateClientRooms();
 	});
 });
