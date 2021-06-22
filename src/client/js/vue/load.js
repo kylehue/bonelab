@@ -1,5 +1,3 @@
-const globals = {};
-
 var loadApp = new Vue({
 	el: "#loadScreen",
 	data: {
@@ -7,11 +5,4 @@ var loadApp = new Vue({
 	}
 });
 
-module.exports = {
-	getApp: function () {
-		return loadApp;
-	},
-	set: function(name, value) {
-		globals[name] = value;
-	}
-};
+module.exports = loadApp;

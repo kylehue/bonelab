@@ -1,6 +1,5 @@
 const config = require("../../../../lib/config.js");
-const utils = require("./utils.js");
-const globals = {};
+const client = require("./../client.js");
 
 var registerApp = new Vue({
 	el: "#registerApp",
@@ -15,70 +14,61 @@ var registerApp = new Vue({
 	},
 	methods: {
 		login: function() {
-			this.hidden = true;
-			this.usernameError = false;
-			this.passwordError = false;
-			this.cpasswordError = false;
-			utils.showApp("loginApp");
+			registerApp.hidden = true;
+			registerApp.usernameError = false;
+			registerApp.passwordError = false;
+			registerApp.cpasswordError = false;
+			require("./login.js").hidden = false;
 		},
 		validate: function() {
 			let un = rusername.value;
 			let pw = rpassword.value;
 			let cpw = cpassword.value;
 
-			if (!globals.client) utils.showApp("loadApp");
-
-			this.usernameError = false;
-			this.passwordError = false;
-			this.cpasswordError = false;
+			registerApp.usernameError = false;
+			registerApp.passwordError = false;
+			registerApp.cpasswordError = false;
 
 			if (un.length < 4) {
-				this.usernameError = true;
-				this.usernameMessage = config.warnMessages.short;
+				registerApp.usernameError = true;
+				registerApp.usernameMessage = config.warnMessages.short;
 			}
 
 			if (!un.length) {
-				this.usernameError = true;
-				this.usernameMessage = config.warnMessages.blank;
+				registerApp.usernameError = true;
+				registerApp.usernameMessage = config.warnMessages.blank;
 			}
 
 			if (pw.length < 6) {
-				this.passwordError = true;
-				this.passwordMessage = config.warnMessages.short;
+				registerApp.passwordError = true;
+				registerApp.passwordMessage = config.warnMessages.short;
 			}
 
 			if (!pw.length) {
-				this.passwordError = true;
-				this.passwordMessage = config.warnMessages.blank;
+				registerApp.passwordError = true;
+				registerApp.passwordMessage = config.warnMessages.blank;
 			}
 
 			if (cpw.length < 6) {
-				this.cpasswordError = true;
-				this.confirmMessage = config.warnMessages.short;
+				registerApp.cpasswordError = true;
+				registerApp.confirmMessage = config.warnMessages.short;
 			}
 
 			if (!cpw.length) {
-				this.cpasswordError = true;
-				this.confirmMessage = config.warnMessages.blank;
+				registerApp.cpasswordError = true;
+				registerApp.confirmMessage = config.warnMessages.blank;
 			}
 
 			if (pw !== cpw) {
-				this.cpasswordError = true;
-				this.confirmMessage = config.warnMessages.unmatchedPassword;
+				registerApp.cpasswordError = true;
+				registerApp.confirmMessage = config.warnMessages.unmatchedPassword;
 			}
 
 			if (un.length >= 4 && pw.length >= 6 && cpw.length >= 6 && un.length && pw.length && cpw.length && pw === cpw) {
-				globals.client.validateRegister(un, pw);
+				client.validateRegister(un, pw);
 			}
 		}
 	}
 });
 
-module.exports = {
-	getApp: function () {
-		return registerApp;
-	},
-	set: function(name, value) {
-		globals[name] = value;
-	}
-};
+module.exports = registerApp;

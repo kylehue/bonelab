@@ -1,9 +1,5 @@
 const config = require("../../../../lib/config.js");
-const utils = require("./utils.js");
-const dialogApp = require("./dialog.js").getApp();
-const roomApp = require("./room.js").getApp();
-const overlay = require("./overlay.js").getApp();
-const globals = {};
+const client = require("./../client.js");
 
 const lobbyApp = new Vue({
 	el: "#lobbyApp",
@@ -30,38 +26,33 @@ const lobbyApp = new Vue({
 			if (!message.length) return;
 
 			composeMessage.value = "";
-			globals.client.sendChat(globals.client.codename, message);
+			client.sendChat(client.codename, message);
 		},
 		logout: function() {
-			dialogApp.show({
+			require("./dialog.js").show({
 				title: "Logout",
 				description: "Are you sure?",
 				proceedText: "Yes",
 				cancelText: "Back",
 				inputHidden: true,
 				proceedFunction: function() {
-					globals.client.logout();
+					client.logout();
 					if (sessionStorage[config.sessionKey]) delete sessionStorage[config.sessionKey];
-					dialogApp.hide();
-					utils.showApp("loginApp");
+					require("./dialog.js").hide();
+					require("./login.js").hidden = false;
+					lobbyApp.hidden = true;
 				},
 				cancelFunction: function() {
-					dialogApp.hide();
+					require("./dialog.js").hide();
 				}
 			});
+			require("./overlay.js").hidden = false;
 		},
 		createRoom: function() {
-			roomApp.hidden = false;
-			overlay.hidden = false;
+			require("./room.js").hidden = false;
+			require("./overlay.js").hidden = false;
 		}
 	}
 });
 
-module.exports = {
-	getApp: function () {
-		return lobbyApp;
-	},
-	set: function(name, value) {
-		globals[name] = value;
-	}
-};
+module.exports = lobbyApp;

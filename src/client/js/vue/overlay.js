@@ -1,5 +1,3 @@
-const globals = {};
-
 const overlay = new Vue({
 	el: "#overlay",
 	data: {
@@ -7,11 +5,4 @@ const overlay = new Vue({
 	}
 });
 
-module.exports = {
-	getApp: function () {
-		return overlay;
-	},
-	set: function(name, value) {
-		globals[name] = value;
-	}
-};
+module.exports = overlay;

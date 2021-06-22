@@ -1,5 +1,3 @@
-const globals = {};
-
 var gameApp = new Vue({
 	el: "#gameCanvas",
 	data: {
@@ -7,11 +5,4 @@ var gameApp = new Vue({
 	}
 });
 
-module.exports = {
-	getApp: function () {
-		return gameApp;
-	},
-	set: function(name, value) {
-		globals[name] = value;
-	}
-};
+module.exports = gameApp;

@@ -1,25 +1,34 @@
-const globals = {};
 const config = require("../../../../lib/config.js");
+const loginApp = require("./login.js");
+const registerApp = require("./register.js");
+const lobbyApp = require("./lobby.js");
+const roomApp = require("./room.js");
+const dialogApp = require("./dialog.js");
+const overlay = require("./overlay.js");
+const loadApp = require("./load.js");
+const gameApp = require("./game.js");
 
 const utils = {
-	set: function(name, value) {
-		globals[name] = value;
-	},
 	showApp(_app) {
-		for (let app of globals.apps) {
-			if (app.name == _app) app.app.hidden = false;
-			else app.app.hidden = true;
-		}
-	},
-	getApp(_app) {
-		for (let app of globals.apps) {
-			if (app.name == _app) {
-				return app.app;				
-			}
-		}
+		if (_app == loginApp) loginApp.hidden = false;
+		else loginApp.hidden = true;
+		if (_app == registerApp) registerApp.hidden = false;
+		else registerApp.hidden = true;
+		if (_app == lobbyApp) lobbyApp.hidden = false;
+		else lobbyApp.hidden = true;
+		if (_app == roomApp) roomApp.hidden = false;
+		else roomApp.hidden = true;
+		if (_app == dialogApp) dialogApp.hidden = false;
+		else dialogApp.hidden = true;
+		if (_app == overlay) overlay.hidden = false;
+		else overlay.hidden = true;
+		if (_app == loadApp) loadApp.hidden = false;
+		else loadApp.hidden = true;
+		if (_app == gameApp) gameApp.hidden = false;
+		else gameApp.hidden = true;
 	},
 	addRoom: function(options) {
-		if (!this.getApp("lobbyApp").hidden) {
+		if (!lobbyApp.hidden) {
 			let numberWrapper = document.createElement("div");
 			numberWrapper.classList.add("roomDetail");
 			numberWrapper.dataset.colname = "number";
@@ -105,7 +114,7 @@ const utils = {
 		}
 	},
 	createLobbyMessage: function(name, message) {
-		if (!this.getApp("lobbyApp").hidden) {
+		if (!lobbyApp.hidden) {
 			let elWrapper = document.createElement("div");
 			elWrapper.classList.add("messageWrapper");
 			let elMessage = document.createElement("p");

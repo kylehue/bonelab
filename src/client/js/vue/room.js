@@ -1,5 +1,5 @@
 const config = require("../../../../lib/config.js");
-const globals = {};
+const client = require("./../client.js");
 
 const roomApp = new Vue({
 	el: "#roomApp",
@@ -12,30 +12,31 @@ const roomApp = new Vue({
 	},
 	methods: {
 		close: function() {
-			this.hidden = true;
-			overlay.hidden = true;
+			roomApp.hidden = true;
+			require("./overlay.js").hidden = true;
 		},
 		join: function() {
 			let description = document.getElementById("roomDescription").value;
 			let waves = parseInt(document.getElementById("roomWaves").value);
 			let password = document.getElementById("roomPassword").value;
-			this.waveErrorHidden = true;
+			roomApp.waveErrorHidden = true;
 
 			if (waves > config.maxWaves) {
-				this.waveError = `— Max is ${config.maxWaves}`;
-				this.waveErrorHidden = false;
+				roomApp.waveError = `— Max is ${config.maxWaves}`;
+				roomApp.waveErrorHidden = false;
 				return;
 			}
 
 			if (waves < config.minWaves) {
-				this.waveError = `— Min is ${config.minWaves}`;
-				this.waveErrorHidden = false;
+				roomApp.waveError = `— Min is ${config.minWaves}`;
+				roomApp.waveErrorHidden = false;
 				return;
 			}
 
-			globals.client.createRoom(description, waves, password);
+			client.createRoom(description, waves, password);
 
-			utils.showApp("loadApp");
+			roomApp.hidden = true;
+			require("./load.js").hidden = false;
 		},
 		validateFormat: function(e) {
 			if (e.keyCode != 8 & e.keyCode != 46) {
@@ -47,8 +48,8 @@ const roomApp = new Vue({
 			}
 		},
 		validateAmount: function() {
-			this.validateMin();
-			this.validateMax();
+			roomApp.validateMin();
+			roomApp.validateMax();
 		},
 		validateMax: function(e) {
 			let value = document.getElementById("roomWaves").value;
@@ -72,7 +73,7 @@ const roomApp = new Vue({
 			}
 			document.getElementById("roomWaves").value = value.toString();
 
-			this.validateAmount();
+			roomApp.validateAmount();
 		},
 		validateDescription: function(e) {
 			let value = document.getElementById("roomDescription").value;
@@ -83,11 +84,4 @@ const roomApp = new Vue({
 	}
 });
 
-module.exports = {
-	getApp: function () {
-		return roomApp;
-	},
-	set: function(name, value) {
-		globals[name] = value;
-	}
-};
+module.exports = roomApp;

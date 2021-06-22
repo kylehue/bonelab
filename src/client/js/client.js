@@ -56,4 +56,6 @@ class Client {
 	}
 }
 
-module.exports = new Client();
+const client = new Client();
+
+module.exports = client;

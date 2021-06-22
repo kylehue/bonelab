@@ -1,6 +1,3 @@
-const overlay = require("./overlay.js");
-const globals = {};
-
 const dialogApp = new Vue({
 	el: "#dialogApp",
 	data: {
@@ -20,24 +17,24 @@ const dialogApp = new Vue({
 		cancel: function() {},
 		show: function(options) {
 			options = options || {};
-			this.title = options.title;
-			this.description = options.description;
-			this.proceedText = options.proceedText;
-			this.cancelText = options.cancelText;
-			this.proceedHidden = options.proceedHidden || false;
-			this.cancelHidden = options.cancelHidden || false;
-			this.inputHidden = options.inputHidden || false;
-			this.hidden = false;
+			dialogApp.title = options.title;
+			dialogApp.description = options.description;
+			dialogApp.proceedText = options.proceedText;
+			dialogApp.cancelText = options.cancelText;
+			dialogApp.proceedHidden = options.proceedHidden || false;
+			dialogApp.cancelHidden = options.cancelHidden || false;
+			dialogApp.inputHidden = options.inputHidden || false;
+			dialogApp.hidden = false;
 
 			if (typeof options.proceedFunction == "function") {
-				this.proceed = options.proceedFunction;
+				dialogApp.proceed = options.proceedFunction;
 			}
 
 			if (typeof options.cancelFunction == "function") {
-				this.cancel = options.cancelFunction;
+				dialogApp.cancel = options.cancelFunction;
 			}
 
-			overlay.hidden = false;
+			require("./overlay.js").hidden = false;
 		},
 		toggleCenter: function(id, center) {
 			let checkState = setInterval(function() {
@@ -50,21 +47,14 @@ const dialogApp = new Vue({
 			}, 10);
 		},
 		showError: function(message) {
-			this.errorHidden = false;
-			this.error = message;
+			dialogApp.errorHidden = false;
+			dialogApp.error = message;
 		},
 		hide: function() {
-			this.hidden = true;
-			overlay.hidden = true;
+			dialogApp.hidden = true;
+			require("./overlay.js").hidden = true;
 		}
 	}
 });
 
-module.exports = {
-	getApp: function () {
-		return dialogApp;
-	},
-	set: function(name, value) {
-		globals[name] = value;
-	}
-};
+module.exports = dialogApp;

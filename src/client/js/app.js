@@ -6,7 +6,12 @@ const key = require("../../../lib/key.js");
 const utils = require("../../../lib/utils.js");
 const client = require("./client.js");
 const vue = require("./vue/vue.js");
-vue.set("client", client);
+
+const room = require("./classes/room.js");
+
+client.socket.on("client:room", room => {
+	console.log(room);
+})
 
 window.client = client;
 
