@@ -148,6 +148,7 @@ io.on("connection", socket => {
 		socket.join(id);
 		io.in(room.id).emit("client:game", player);
 		socket.emit("client:room:enter");
+		updateClientRooms();
 	});
 
 	socket.on("client:create:room", (description, waves, password) => {
