@@ -2,14 +2,15 @@ const uuid = require("uuid");
 const Player = require("./player.js");
 
 class Room {
-	constructor(index, description, waves, password) {
+	constructor(options) {
+		options = options || {};
 		this.id = uuid.v4();
-		this.index = index;
-		this.description = description;
+		this.index = options.index || -1;
+		this.description = options.description || "";
+		this.password = options.password || "";
+		this.maxWave = options.maxWave || 0;
 		this.currentWave = 1;
-		this.password = password;
 		this.players = [];
-		this.maxWave = waves;
 	}
 
 	addPlayer(id) {
@@ -19,13 +20,15 @@ class Room {
 	}
 
 	removePlayer(id) {
-		let player = this.players.find(player => player.id === id);
-		this.players.splice(this.players.indexOf(player), 1);
+		let player = this.players.find(p => p.id === id);
+		if (player) {
+			this.players.splice(this.players.indexOf(player), 1);
+		}
 	}
 }
 
 module.exports = {
-	create: function (index, description, waves, password) {
-		return new Room(index, description, waves, password);
+	create: function(options) {
+		return new Room(options);
 	}
 };

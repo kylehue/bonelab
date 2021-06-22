@@ -259,4 +259,6 @@ class Renderer {
 	}
 }
 
-module.exports = new Renderer();
+const renderer = new Renderer();
+
+module.exports = renderer;

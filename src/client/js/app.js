@@ -9,13 +9,26 @@ const vue = require("./vue/vue.js");
 
 const room = require("./classes/room.js");
 
-client.socket.on("client:room", room => {
-	console.log(room);
-})
-
 window.client = client;
+
+let circles = [];
+
+/*for(var i = 0; i < 1000; i++){
+	circles.push({
+		pos: vector(utils.random(0, innerWidth), utils.random(0, innerHeight)),
+		radius: utils.random(5, 20)
+	})
+}*/
 
 renderer.fullscreen();
 renderer.render(function() {
-	
+	/*for(var i = 0; i < circles.length; i++){
+		let circle = circles[i];
+		renderer.circle(circle.pos.x, circle.pos.y, circle.radius, {
+			fill: "white"
+		})
+	}*/
+	/*renderer.circle(100, 100, 100, {
+		fill: "white"
+	})*/
 });

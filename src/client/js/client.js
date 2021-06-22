@@ -3,6 +3,7 @@ const io = require("socket.io-client");
 class Client {
 	constructor() {
 		this.socket = io();
+		this.roomId = null;
 
 		this.socket.on("connect", () => {
 
@@ -48,11 +49,12 @@ class Client {
 	}
 
 	join(roomId) {
-		this.socket.emit("client:room", roomId);
+		this.socket.emit("client:room:join", roomId);
+		this.roomId = roomId;
 	}
 
 	leave() {
-		this.socket.emit("client:leave", this.socket.id);
+		this.socket.emit("client:room:leave", this.roomId);
 	}
 }
 

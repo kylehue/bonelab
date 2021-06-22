@@ -17,49 +17,36 @@ client.socket.on("client:room:enter", () => {
 	utils.showApp(gameApp);
 });
 
-client.socket.on("room:update", rooms => {
-	//Get all existing rooms
-	let _existingRooms = document.getElementsByClassName("roomWrapper");
+client.socket.on("room:delete", roomId => {
+	let el = document.querySelector(`[data-id='${roomId}']`);
+	if (el) {
+		el.remove();
+	}
+});
 
-	//Make object
-	let existingRooms = [];
-	for (let room of _existingRooms) {
-		existingRooms.push({
-			id: room.roomId,
-			element: room
-		});
+client.socket.on("room:update", room => {
+	let roomElements = document.querySelectorAll(".roomWrapper");
+	let existingIds = [];
+	for (let roomEl of roomElements) {
+		existingIds.push(roomEl.dataset.id);
 	}
 
-	//Loop through server rooms
-	for (let room of rooms) {
-		let el = null;
-		//Loop through existing rooms inside the DOM
-		for (let existing of existingRooms) {
-			//Check if the room already exists
-			let rm = existingRooms.find(er => er.id == room.id);
-			if (rm) {
-				el = existing.element;
-				break;
+	if (existingIds.includes(room.id)) {
+		let element = document.querySelector(`[data-id='${room.id}']`);
+		let children = element.children;
+		for (let child of children) {
+			if (child.dataset.colname == "number") {
+				child.getElementsByTagName("p")[0].innerText = room.index;
+			} else if (child.dataset.colname == "description") {
+				child.getElementsByTagName("p")[0].innerText = room.description;
+			} else if (child.dataset.colname == "wave") {
+				child.getElementsByTagName("p")[0].innerText = `${room.currentWave}/${room.maxWave}`;
+			} else if (child.dataset.colname == "players") {
+				child.getElementsByTagName("p")[0].innerText = `${room.players.length}/${config.maxPlayers}`;
 			}
 		}
-
-		//If the room already exists, just update it. If not, then add it to the document
-		if (el) {
-			let children = el.children;
-			for (let child of children) {
-				if (child.dataset.colname == "number") {
-					child.getElementsByTagName("p")[0].innerText = room.index;
-				} else if (child.dataset.colname == "description") {
-					child.getElementsByTagName("p")[0].innerText = room.description;
-				} else if (child.dataset.colname == "wave") {
-					child.getElementsByTagName("p")[0].innerText = `${room.currentWave}/${room.maxWave}`;
-				} else if (child.dataset.colname == "players") {
-					child.getElementsByTagName("p")[0].innerText = `${room.players.length}/${config.maxPlayers}`;
-				}
-			}
-		} else {
-			utils.addRoom(room);
-		}
+	} else {
+		utils.addRoom(room);
 	}
 });
 
@@ -178,3 +165,11 @@ window.onload = function() {
 		console.log("Session has expired. Please login again");
 	}
 }
+
+function showGame() {
+	lobbyApp.hidden = true;
+	loginApp.hidden = true;
+	gameApp.hidden = false;
+}
+
+window.showGame = showGame;

@@ -7,6 +7,7 @@ const dialogApp = require("./dialog.js");
 const overlay = require("./overlay.js");
 const loadApp = require("./load.js");
 const gameApp = require("./game.js");
+const client = require("./../client.js");
 
 const utils = {
 	showApp(_app) {
@@ -102,8 +103,8 @@ const utils = {
 			playersWrapper.appendChild(playersContent);
 
 			let roomWrapper = document.createElement("div");
-			roomWrapper.roomId = options.id;
-			roomWrapper.classList.add("roomWrapper", "glass2");
+			roomWrapper.dataset.id = options.id;
+			roomWrapper.classList.add("roomWrapper", "glass-2");
 			roomWrapper.appendChild(numberWrapper);
 			roomWrapper.appendChild(descriptionWrapper);
 			roomWrapper.appendChild(waveWrapper);
@@ -111,6 +112,22 @@ const utils = {
 
 			let list = document.getElementById("roomListWrapper");
 			list.appendChild(roomWrapper);
+
+			roomWrapper.addEventListener("click", function() {
+				dialogApp.show({
+					title: "Join room",
+					description: "Are you sure?",
+					proceedText: "Join",
+					cancelText: "Back",
+					inputHidden: true,
+					proceedFunction: function() {
+						client.join(options.id);
+					},
+					cancelFunction: function() {
+						dialogApp.hide();
+					}
+				});
+			});
 		}
 	},
 	createLobbyMessage: function(name, message) {

@@ -10,9 +10,13 @@ class Room {
 	}
 }
 
-client.socket.on("client:room:enter", room => {
+client.socket.on("client:game", player => {
+	console.log(player);
+});
+
+client.socket.on("client:game:update", room => {
 	console.log(room);
-})
+});
 
 const room = new Room();
 

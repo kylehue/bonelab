@@ -26,12 +26,28 @@ function toggleOffline(id, value) {
 	});
 }
 
-function updateClientRooms() {
-	io.emit("room:update", game.rooms);
+function updateLobbyRooms() {
+	for(var i = 0; i < game.rooms.length; i++){
+		io.emit("room:update", game.rooms[i]);
+	}
 }
 
 io.on("connection", socket => {
-	console.log(`${socket.id} has connected.`);
+	if (eventLogs) console.log(`${socket.id} has connected`);
+
+	socket.on("disconnect", () => {
+		if (eventLogs) console.log(`${socket.id} has disconnected`);
+		game.removePlayer(socket.id);
+		updateLobbyRooms();
+
+		//Delete empty rooms
+		for (let room of game.rooms) {
+			if (!room.players.length) {
+				game.removeRoom(room.id);
+				io.emit("room:delete", room.id);
+			}
+		}
+	});
 
 	socket.on("client:codename:validate", codename => {
 		database.in("users").find({
@@ -106,7 +122,7 @@ io.on("connection", socket => {
 				};
 
 				socket.emit("client:load", loadData);
-				updateClientRooms();
+				updateLobbyRooms();
 				toggleOffline(id, false);
 			}
 		});
@@ -142,18 +158,40 @@ io.on("connection", socket => {
 		});
 	});
 
-	socket.on("client:room", id => {
-		let room = game.getRoom(id);
+	socket.on("client:room:join", roomId => {
+		let room = game.getRoom(roomId);
 		let player = room.addPlayer(socket.id);
-		socket.join(id);
+		socket.join(roomId);
 		io.in(room.id).emit("client:game", player);
 		socket.emit("client:room:enter");
-		updateClientRooms();
+		updateLobbyRooms();
+	});
+
+	socket.on("client:room:leave", roomId => {
+		let room = game.getRoom(roomId);
+		if (room) {
+			room.removePlayer(socket.id);
+		} else {
+			if (eventLogs) console.log("Removing a player has failed")
+		}
 	});
 
 	socket.on("client:create:room", (description, waves, password) => {
-		let room = game.createRoom(description, waves, password);
+		let room = game.createRoom({
+			description: description, 
+			maxWave: waves, 
+			password: password
+		});
+		
 		socket.emit("client:join", room.id);
-		updateClientRooms();
+		updateLobbyRooms();
 	});
 });
+
+function updateGame() {
+	for (let room of game.rooms) {
+		io.in(room.id).emit("client:game:update", room);
+	}
+}
+
+setInterval(updateGame, 1000 / 30);
