@@ -23,7 +23,7 @@ class Renderer {
 			f();
 
 			if (!this.context.offscreens.length) return;
-			this.drawOffscreens();
+			//this.drawOffscreens();
 		});
 	}
 
@@ -50,6 +50,7 @@ class Renderer {
 	fullscreen() {
 		this.setSize(innerWidth, innerHeight);
 		addEventListener("resize", () => {
+			this.canvas.width = innerWidth
 			this.setSize(innerWidth, innerHeight);
 		});
 	}

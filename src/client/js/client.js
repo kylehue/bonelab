@@ -10,6 +10,48 @@ class Client {
 		});
 	}
 
+	setMouse(x, y) {
+		if (this.roomId) {
+			this.socket.emit("client:game:mouse", this.roomId, x, y);
+		}
+	}
+
+	setPosition(x, y) {
+		if (this.roomId) {
+			this.socket.emit("client:game:position", this.roomId, x, y);
+		}
+	}
+
+	shoot() {
+		if (this.roomId) {
+			this.socket.emit("client:game:shoot", this.roomId);
+		}
+	}
+
+	moveUp() {
+		if (this.roomId) {
+			this.socket.emit("client:game:move:up", this.roomId);
+		}
+	}
+
+	moveRight() {
+		if (this.roomId) {
+			this.socket.emit("client:game:move:right", this.roomId);
+		}
+	}
+
+	moveDown() {
+		if (this.roomId) {
+			this.socket.emit("client:game:move:down", this.roomId);
+		}
+	}
+
+	moveLeft() {
+		if (this.roomId) {
+			this.socket.emit("client:game:move:left", this.roomId);
+		}
+	}
+
 	sendChat(name, message) {
 		this.socket.emit("client:message:lobby", name, message);
 	}

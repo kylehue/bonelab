@@ -13,6 +13,7 @@ app.use(express.static(__dirname + "/../client"));
 const database = require("./database.js");
 
 //Handle game
+const config = require("../../lib/config.js");
 const game = require("./classes/game.js");
 let eventLogs = true;
 
@@ -27,8 +28,8 @@ function toggleOffline(id, value) {
 }
 
 function updateLobbyRooms() {
-	for(var i = 0; i < game.rooms.length; i++){
-		io.emit("room:update", game.rooms[i]);
+	for (var i = 0; i < game.rooms.length; i++) {
+		io.emit("client:lobby:room:update", game.rooms[i]);
 	}
 }
 
@@ -162,8 +163,8 @@ io.on("connection", socket => {
 		let room = game.getRoom(roomId);
 		let player = room.addPlayer(socket.id);
 		socket.join(roomId);
-		io.in(room.id).emit("client:game", player);
-		socket.emit("client:room:enter");
+		socket.emit("client:room:enter", room);
+		io.in(room.id).emit("client:player:add", player);
 		updateLobbyRooms();
 	});
 
@@ -178,20 +179,113 @@ io.on("connection", socket => {
 
 	socket.on("client:create:room", (description, waves, password) => {
 		let room = game.createRoom({
-			description: description, 
-			maxWave: waves, 
+			description: description,
+			maxWave: waves,
 			password: password
 		});
-		
+
 		socket.emit("client:join", room.id);
 		updateLobbyRooms();
 	});
+
+	socket.on("client:game:mouse", (roomId, x, y) => {
+		let room = game.getRoom(roomId);
+		if (room) {
+			let player = room.getPlayer(socket.id);
+			if (player) {
+				player.setMouse(x, y);
+			}
+		}
+	});
+
+	socket.on("client:game:move:up", roomId => {
+		let room = game.getRoom(roomId);
+		if (room) {
+			let player = room.getPlayer(socket.id);
+			if (player) {
+				player.moveUp();
+			}
+		}
+	});
+
+	socket.on("client:game:move:right", roomId => {
+		let room = game.getRoom(roomId);
+		if (room) {
+			let player = room.getPlayer(socket.id);
+			if (player) {
+				player.moveRight();
+			}
+		}
+	});
+
+	socket.on("client:game:move:down", roomId => {
+		let room = game.getRoom(roomId);
+		if (room) {
+			let player = room.getPlayer(socket.id);
+			if (player) {
+				player.moveDown();
+			}
+		}
+	});
+
+	socket.on("client:game:move:left", roomId => {
+		let room = game.getRoom(roomId);
+		if (room) {
+			let player = room.getPlayer(socket.id);
+			if (player) {
+				player.moveLeft();
+			}
+		}
+	});
+
+	socket.on("client:game:position", (roomId, x, y) => {
+		let room = game.getRoom(roomId);
+		if (room) {
+			let player = room.getPlayer(socket.id);
+			if (player) {
+				player.position.set(x, y);
+			}
+		}
+	});
+
+	socket.on("client:game:shoot", roomId => {
+		let room = game.getRoom(roomId);
+		if (room) {
+			let player = room.getPlayer(socket.id);
+			if (player) {
+				player.shoot(room);
+			}
+		}
+	});
 });
 
-function updateGame() {
-	for (let room of game.rooms) {
-		io.in(room.id).emit("client:game:update", room);
+function updateClient() {
+	for (var i = 0; i < game.rooms.length; i++) {
+		let room = game.rooms[i];
+		io.in(room.id).emit("client:room:update", room);
 	}
 }
 
+function updateGame() {
+	for (var i = 0; i < game.rooms.length; i++) {
+		let room = game.rooms[i];
+		//Update players
+		for (var j = 0; j < room.players.length; j++) {
+			let player = room.players[j];
+			if (player) {
+				player.update(room);
+			}
+		}
+
+		//Update bullets
+		for (var j = 0; j < room.bullets.length; j++) {
+			let bullet = room.bullets[j];
+			if (bullet) {
+				bullet.update(room);
+			}
+		}
+	}
+}
+
+setInterval(updateClient, 1000 / 30);
 setInterval(updateGame, 1000 / 30);

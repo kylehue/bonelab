@@ -6,11 +6,22 @@ const roomApp = require("./room.js");
 const dialogApp = require("./dialog.js");
 const overlay = require("./overlay.js");
 const loadApp = require("./load.js");
-const gameApp = require("./game.js");
 const client = require("./../client.js");
 
 const utils = {
-	showApp(_app) {
+	showGame: function() {
+		let canvas = document.getElementById("gameCanvas");
+		let ui = document.getElementById("gameApp");
+		canvas.style.display = "block";
+		ui.style.display = "none";
+	},
+	hideGame: function() {
+		let canvas = document.getElementById("gameCanvas");
+		let ui = document.getElementById("gameApp");
+		canvas.style.display = "none";
+		ui.style.display = "block";
+	},
+	showApp: function(_app) {
 		if (_app == loginApp) loginApp.hidden = false;
 		else loginApp.hidden = true;
 		if (_app == registerApp) registerApp.hidden = false;
@@ -25,8 +36,6 @@ const utils = {
 		else overlay.hidden = true;
 		if (_app == loadApp) loadApp.hidden = false;
 		else loadApp.hidden = true;
-		if (_app == gameApp) gameApp.hidden = false;
-		else gameApp.hidden = true;
 	},
 	addRoom: function(options) {
 		if (!lobbyApp.hidden) {

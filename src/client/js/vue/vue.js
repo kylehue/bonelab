@@ -1,4 +1,6 @@
+const client = require("./../client.js");
 const config = require("../../../../lib/config.js");
+const utils = require("./utils.js");
 const loginApp = require("./login.js");
 const registerApp = require("./register.js");
 const lobbyApp = require("./lobby.js");
@@ -6,15 +8,13 @@ const roomApp = require("./room.js");
 const dialogApp = require("./dialog.js");
 const overlay = require("./overlay.js");
 const loadApp = require("./load.js");
-const gameApp = require("./game.js");
-const utils = require("./utils.js");
-const client = require("./../client.js");
 
 let setCodename = false;
 
 client.socket.on("client:room:enter", () => {
 	overlay.hidden = true;
-	utils.showApp(gameApp);
+	utils.showApp("");
+	utils.showGame();
 });
 
 client.socket.on("room:delete", roomId => {
@@ -24,7 +24,7 @@ client.socket.on("room:delete", roomId => {
 	}
 });
 
-client.socket.on("room:update", room => {
+client.socket.on("client:lobby:room:update", room => {
 	let roomElements = document.querySelectorAll(".roomWrapper");
 	let existingIds = [];
 	for (let roomEl of roomElements) {
@@ -165,11 +165,3 @@ window.onload = function() {
 		console.log("Session has expired. Please login again");
 	}
 }
-
-function showGame() {
-	lobbyApp.hidden = true;
-	loginApp.hidden = true;
-	gameApp.hidden = false;
-}
-
-window.showGame = showGame;
