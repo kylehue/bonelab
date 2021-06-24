@@ -35,7 +35,6 @@ class Database {
 
 	in (name) {
 		let table = this.tables.find(tb => tb.name == name);
-		this.load(table.name);
 		return table.data;
 	}
 }

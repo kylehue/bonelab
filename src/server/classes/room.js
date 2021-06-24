@@ -1,6 +1,7 @@
 const uuid = require("uuid");
 const Quadtree = require('@timohausmann/quadtree-js');
 const Player = require("./player.js");
+const Zombie = require("./zombie.js");
 const Bullet = require("./bullet.js");
 const Barrier = require("./barrier.js");
 const config = require("../../../lib/config.js");
@@ -25,9 +26,18 @@ class Room {
 		this.background = config.map.background || "#000";
 
 		//Objects
+		this.quadtree = new Quadtree({
+			x: -this.size / 2,
+			y: -this.size / 2,
+			width: this.size,
+			height: this.size
+		});
+
 		this.players = [];
+		this.zombies = [];
 		this.bullets = [];
 
+		//Add walls
 		let wallWidth = 10;
 		this.barriers = [
 			Barrier.create({
@@ -53,15 +63,17 @@ class Room {
 		];
 
 		//Add random barriers
+		let minSpacing = 50;
+		let sizeOffset = Math.pow(this.size, 0.6);
 		let addBarrierStart = Date.now();
-		for (var i = 0; i < config.map.maxBarriers; i++) {
+		for (var i = 0; i < this.size * 0.02; i++) {
 			let pos = this.getRandomPosition();
-			let width = utils.random(config.barrier.min.width, config.barrier.max.width);
-			let height = utils.random(config.barrier.min.height, config.barrier.max.height);
+			let width = utils.random(config.barrier.min.width + sizeOffset / 2, config.barrier.max.width + sizeOffset);
+			let height = utils.random(config.barrier.min.height + sizeOffset / 2, config.barrier.max.height + sizeOffset);
 			let newBarrier = Barrier.create({
 				position: pos,
-				width: width,
-				height: height
+				width: width + minSpacing,
+				height: height + minSpacing
 			});
 
 			//Don't let the new barrier spawn on top of other barriers
@@ -69,12 +81,12 @@ class Room {
 				let otherBarrier = this.barriers[j];
 				if (shape.SAT(newBarrier.shape, otherBarrier.shape)) {
 					pos = this.getRandomPosition();
-					width = utils.random(config.barrier.min.width, config.barrier.max.width);
-					height = utils.random(config.barrier.min.height, config.barrier.max.height);
+					width = utils.random(config.barrier.min.width + sizeOffset / 2, config.barrier.max.width + sizeOffset);
+					height = utils.random(config.barrier.min.height + sizeOffset / 2, config.barrier.max.height + sizeOffset);
 					newBarrier = Barrier.create({
 						position: pos,
-						width: width,
-						height: height
+						width: width + minSpacing,
+						height: height + minSpacing
 					});
 
 					//Safety leverage in case the new barrier gets stuck at finding its own position
@@ -84,8 +96,63 @@ class Room {
 				}
 			}
 
-			this.barriers.push(newBarrier);
+			this.barriers.push(Barrier.create({
+				position: newBarrier.position,
+				width: newBarrier.width - minSpacing,
+				height: newBarrier.height - minSpacing
+			}));
 		}
+
+		//Add random zombies
+		for(var i = 0; i < 100; i++){
+			this.addZombie();
+		}
+	}
+
+	update() {
+		//Add players to quadtree
+		for (var i = 0; i < this.players.length; i++) {
+			let player = this.players[i];
+			player.addToQuadtree(this.quadtree);
+		}
+
+		//Add zombies to quadtree
+		for (var i = 0; i < this.zombies.length; i++) {
+			let zombie = this.zombies[i];
+			zombie.addToQuadtree(this.quadtree);
+		}
+
+		//Add bullets to quadtree
+		for (var i = 0; i < this.bullets.length; i++) {
+			let bullet = this.bullets[i];
+			bullet.addToQuadtree(this.quadtree);
+		}
+
+		//Add barriers to quadtree
+		for (var i = 0; i < this.barriers.length; i++) {
+			let barrier = this.barriers[i];
+			barrier.addToQuadtree(this.quadtree);
+		}
+
+		//Update players
+		for (var i = 0; i < this.players.length; i++) {
+			let player = this.players[i];
+			player.update(this);
+		}
+
+		//Update zombies
+		for (var i = 0; i < this.zombies.length; i++) {
+			let zombie = this.zombies[i];
+			zombie.update(this);
+		}
+
+		//Update bullets
+		for (var i = 0; i < this.bullets.length; i++) {
+			let bullet = this.bullets[i];
+			bullet.update(this);
+		}
+
+		this.quadtree.clear();
 	}
 
 	getPlayer(id) {
@@ -98,6 +165,20 @@ class Room {
 			position: this.getRandomPosition(),
 			radius: config.player.radius
 		});
+
+		//Don't let the player spawn inside a barrier
+		for (var i = 0; i < this.barriers.length; i++) {
+			let barrier = this.barriers[i];
+			if (shape.SAT(player.shape, barrier.shape)) {
+				player = Player.create(id, {
+					position: this.getRandomPosition(),
+					radius: config.player.radius
+				});
+
+				i = -1;
+			}
+		}
+
 		this.players.push(player);
 		return player;
 	}
@@ -106,6 +187,41 @@ class Room {
 		let player = this.getPlayer(id);
 		if (player) {
 			this.players.splice(this.players.indexOf(player), 1);
+		}
+	}
+
+	getZombie(id) {
+		let zombie = this.zombies.find(z => z.id === id);
+		return zombie;
+	}
+
+	addZombie() {
+		let zombie = Zombie.create({
+			position: this.getRandomPosition(),
+			radius: config.zombie.radius
+		});
+
+		//Don't let the zombie spawn inside a barrier
+		for (var i = 0; i < this.barriers.length; i++) {
+			let barrier = this.barriers[i];
+			if (shape.SAT(zombie.shape, barrier.shape)) {
+				zombie = Zombie.create({
+					position: this.getRandomPosition(),
+					radius: config.zombie.radius
+				});
+
+				i = -1;
+			}
+		}
+
+		this.zombies.push(zombie);
+		return zombie;
+	}
+
+	removeZombie(id) {
+		let zombie = this.getZombie(id);
+		if (zombie) {
+			this.zombies.splice(this.zombies.indexOf(zombie), 1);
 		}
 	}
 

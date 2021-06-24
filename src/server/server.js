@@ -269,21 +269,7 @@ function updateClient() {
 function updateGame() {
 	for (var i = 0; i < game.rooms.length; i++) {
 		let room = game.rooms[i];
-		//Update players
-		for (var j = 0; j < room.players.length; j++) {
-			let player = room.players[j];
-			if (player) {
-				player.update(room);
-			}
-		}
-
-		//Update bullets
-		for (var j = 0; j < room.bullets.length; j++) {
-			let bullet = room.bullets[j];
-			if (bullet) {
-				bullet.update(room);
-			}
-		}
+		room.update();
 	}
 }
 

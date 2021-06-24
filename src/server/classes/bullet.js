@@ -9,6 +9,18 @@ class Bullet {
 		this.positionOrigin = this.position.copy();
 		this.angle = options.angle;
 		this.radius = config.bullet.radius;
+
+		this.label = "bullet";
+	}
+
+	addToQuadtree(quadtree) {
+		quadtree.insert({
+			x: this.position.x - this.radius,
+			y: this.position.y - this.radius,
+			width: this.radius,
+			height: this.radius,
+			self: this
+		});
 	}
 
 	update(room) {

@@ -11,15 +11,7 @@ const Room = require("./classes/room.js");
 window.client = client;
 
 let room = null;
-
-let shapeA = shape.rect(0, 0, 100, 100);
-let shapeB = shape.rect(50, 90, 100, 100);
-console.log(shape.SAT(shapeA, shapeB))
-
-mouse.on("mousemove", function() {
-	let wm = renderer.camera.screenToWorld(mouse.x, mouse.y);
-	client.setMouse(wm.x, wm.y);
-});
+let player = null;
 
 client.socket.on("client:room:enter", serverRoom => {
 	//Create the client's room
@@ -52,6 +44,9 @@ client.socket.on("client:room:enter", serverRoom => {
 			radius: bullet.radius
 		});
 	}
+
+	//Get this client's player
+	player = room.getPlayer(client.socket.id);
 });
 
 client.socket.on("client:room:update", serverRoom => {
@@ -90,6 +85,39 @@ client.socket.on("client:room:update", serverRoom => {
 		if (!player) {
 			//If not, remove the player in the room
 			room.removePlayer(clientPlayer.id);
+		}
+	}
+
+	//Adding / Updating zombies
+
+	let serverZombies = serverRoom.zombies;
+	for (var i = 0; i < serverZombies.length; i++) {
+		let serverZombie = serverZombies[i];
+		//Check if the server zombie already exists in the client's room
+		let clientZombie = room.getZombie(serverZombie.id);
+		if (clientZombie) {
+			//If it exists, just update it
+			clientZombie.serverPosition.set(serverZombie.position);
+			clientZombie.radius = serverZombie.radius;
+		} else {
+			//If it doesn't exist, add it in the client's room
+			room.addZombie(serverZombie.id, {
+				position: vector(serverZombie.position),
+				radius: serverZombie.radius
+			});
+		}
+	}
+
+	//Deleting zombies
+
+	//Loop through client zombies
+	for (var i = 0; i < room.zombies.length; i++) {
+		let clientZombie = room.zombies[i];
+		//Check if a client zombie exists in the server zombies
+		let zombie = serverZombies.find(z => z.id === clientZombie.id);
+		if (!zombie) {
+			//If not, remove the zombie in the room
+			room.removeZombie(clientZombie.id);
 		}
 	}
 
@@ -150,26 +178,33 @@ client.socket.on("client:room:update", serverRoom => {
 
 renderer.fullscreen();
 renderer.render(function() {
-	if (key.check(config.player.controls.moveUp)) {
-		client.moveUp();
-	}
-	if (key.check(config.player.controls.moveRight)) {
-		client.moveRight();
-	}
-	if (key.check(config.player.controls.moveDown)) {
-		client.moveDown();
-	}
-	if (key.check(config.player.controls.moveLeft)) {
-		client.moveLeft();
-	}
-	if (mouse.pressed) {
-		client.shoot();
+	if (room) {
+		let wm = renderer.camera.screenToWorld(mouse.x, mouse.y);
+		client.setMouse(wm.x, wm.y);
+
+		if (key.check(config.player.controls.moveUp)) {
+			client.moveUp();
+		}
+		if (key.check(config.player.controls.moveRight)) {
+			client.moveRight();
+		}
+		if (key.check(config.player.controls.moveDown)) {
+			client.moveDown();
+		}
+		if (key.check(config.player.controls.moveLeft)) {
+			client.moveLeft();
+		}
+		if (mouse.pressed) {
+			client.shoot();
+		}
 	}
 
 	renderer.camera.begin(function() {
 		if (room) {
-			renderer.camera.moveTo(0, 0);
-			renderer.camera.zoomTo(room.size);
+			if (room.localPlayer) {
+				renderer.camera.moveTo(room.localPlayer.position.x, room.localPlayer.position.y);
+				renderer.camera.zoomTo(config.player.zoom);
+			}
 			room.render(renderer);
 			room.update();
 		}
@@ -179,5 +214,6 @@ renderer.render(function() {
 key.on("keydown", function() {
 	if (key.code == 16) {
 		console.log(renderer.getFrameRate());
+		console.log(room);
 	}
 })

@@ -9,6 +9,18 @@ class Barrier {
 		this.width = options.width;
 		this.height = options.height;
 		this.shape = shape.rect(this.position.x, this.position.y, this.width, this.height);
+
+		this.label = "barrier";
+	}
+
+	addToQuadtree(quadtree) {
+		quadtree.insert({
+			x: this.position.x - this.width / 2,
+			y: this.position.y - this.height / 2,
+			width: this.width,
+			height: this.height,
+			self: this
+		});
 	}
 
 	update(room) {
