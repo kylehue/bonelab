@@ -106,6 +106,7 @@ client.socket.on("client:codename:success", codename => {
 });
 
 client.socket.on("client:load", data => {
+	utils.showApp(lobbyApp);
 	let keys = Object.keys(data);
 	for (let key of keys) {
 		client[key] = data[key];
@@ -153,7 +154,6 @@ client.socket.on("client:load", data => {
 	sessionStorage.setItem(config.sessionKey, data.id);
 
 	console.log(client);
-	utils.showApp(lobbyApp);
 });
 
 //Load session
