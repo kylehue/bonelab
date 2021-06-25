@@ -1,8 +1,12 @@
+const Stats = require("stats.js");
 class Engine {
 	constructor() {
 		this.frameRate = 0;
 		this.frameCount = 0;
 		this._targetFrameRate = 60;
+		this.stats = new Stats();
+		this.stats.showPanel(0);
+		document.body.appendChild(this.stats.dom);
 	}
 
 	run(f) {
@@ -11,12 +15,14 @@ class Engine {
 		let delta;
 		let engine = this;
 		(function animate() {
-			delta = (performance.now() - startTime) / 1000;
+			engine.stats.begin();
+			/*delta = (performance.now() - startTime) / 1000;
 			engine.frameRate = 1 / delta;
 			startTime = performance.now();
-			engine.frameCount++;
+			engine.frameCount++;*/
 			if (typeof f == "function") f();
 
+			engine.stats.end();
 			requestAnimationFrame(animate);
 		})();
 	}

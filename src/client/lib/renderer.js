@@ -1,4 +1,4 @@
-const camera = require("../../../lib/camera.js");
+const camera = require("./camera.js");
 const engine = require("./engine.js");
 
 class Renderer {
