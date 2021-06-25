@@ -14,7 +14,7 @@ class Bullet {
 	}
 
 	update() {
-		this.position.lerp(this.serverPosition, 0.2);
+		this.position.lerp(this.serverPosition, 0.3);
 	}
 }
 

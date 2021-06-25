@@ -1,16 +1,16 @@
-const shape = require("../../../../lib/shape.js");
-
 class Barrier {
 	constructor(id, options) {
 		this.id = id;
 		this.position = options.position;
 		this.width = options.width;
 		this.height = options.height;
-		this.shape = shape.rect(this.position.x, this.position.y, this.width, this.height);
+		this.angle = options.angle;
+		
+		this.vertices = options.vertices;
 	}
 
 	render(renderer) {
-		renderer.fromVertices(this.shape.vertices, {
+		renderer.fromVertices(this.vertices, {
 			fill: "#222"
 		});
 	}
