@@ -105,7 +105,7 @@ const utils = {
 
 			let playersText = document.createElement("p");
 			playersText.innerHTML = "&nbsp;"
-			playersText.innerText = `${options.players.length}/${100}`;
+			playersText.innerText = `${options.playerCount}/${100}`;
 
 			playersContent.appendChild(playersIcon);
 			playersContent.appendChild(playersText);
