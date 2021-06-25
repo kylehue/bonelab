@@ -27,9 +27,92 @@ function toggleOffline(id, value) {
 	});
 }
 
+function parseRoom(room, options) {
+	options = options || {};
+	let parsedRoom = {
+		id: room.id,
+		index: room.index,
+		description: room.description,
+		password: room.password,
+		maxWave: room.maxWave,
+		currentWave: room.currentWave,
+		size: room.size,
+		background: room.background,
+		playerCount: room.players.length
+	};
+
+	if (options.players || options.objects) {
+		let players = [];
+		for (var j = 0; j < room.players.length; j++) {
+			let player = room.players[j];
+			players.push({
+				id: player.id,
+				mouse: player.mouse,
+				position: player.position,
+				radius: player.radius,
+				angle: player.angle
+			});
+		}
+
+		parsedRoom.players = players;
+	}
+
+	if (options.zombies || options.objects) {
+		let zombies = [];
+		for (var j = 0; j < room.zombies.length; j++) {
+			let zombie = room.zombies[j];
+			zombies.push({
+				id: zombie.id,
+				position: zombie.position,
+				radius: zombie.radius,
+				angle: zombie.angle
+			});
+		}
+
+		parsedRoom.zombies = zombies;
+	}
+
+	if (options.bullets || options.objects) {
+		let bullets = [];
+		for (var j = 0; j < room.bullets.length; j++) {
+			let bullet = room.bullets[j];
+			bullets.push({
+				id: bullet.id,
+				playerId: bullet.playerId,
+				position: bullet.position,
+				radius: bullet.radius
+			});
+		}
+
+		parsedRoom.bullets = bullets;
+	}
+
+	if (options.barriers || options.objects) {
+		let barriers = [];
+		for (var j = 0; j < room.barriers.length; j++) {
+			let barrier = room.barriers[j];
+			barriers.push({
+				id: barrier.id,
+				position: barrier.position,
+				width: barrier.width,
+				height: barrier.height,
+				angle: barrier.angle,
+				vertices: barrier.vertices
+			});
+		}
+
+		parsedRoom.barriers = barriers;
+	}
+
+	return parsedRoom;
+}
+
 function updateLobbyRooms() {
 	for (var i = 0; i < game.rooms.length; i++) {
-		io.emit("client:lobby:room:update", game.rooms[i]);
+		let room = game.rooms[i];
+		io.emit("client:lobby:room:update", parseRoom(room, {
+			players: true
+		}));
 	}
 }
 
@@ -60,7 +143,7 @@ io.on("connection", socket => {
 				socket.emit("client:codename:success", codename);
 			}
 		});
-	})
+	});
 
 	socket.on("client:codename", (id, codename) => {
 		database.in("users").update({
@@ -163,8 +246,12 @@ io.on("connection", socket => {
 		let room = game.getRoom(roomId);
 		let player = room.addPlayer(socket.id);
 		socket.join(roomId);
-		socket.emit("client:room:enter", room);
-		io.in(room.id).emit("client:player:add", player);
+		let parsedRoom = parseRoom(room, {
+			players: true
+		});
+		let parsedPlayer = parsedRoom.players.find(p => p.id === player.id);
+		socket.emit("client:room:enter", parsedRoom);
+		io.in(room.id).emit("client:player:add", parsedPlayer);
 		updateLobbyRooms();
 	});
 
@@ -262,7 +349,9 @@ io.on("connection", socket => {
 function updateClient() {
 	for (var i = 0; i < game.rooms.length; i++) {
 		let room = game.rooms[i];
-		io.in(room.id).emit("client:room:update", room);
+		io.in(room.id).emit("client:room:update", parseRoom(room, {
+			objects: true
+		}));
 	}
 }
 
