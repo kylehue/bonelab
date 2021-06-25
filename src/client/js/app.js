@@ -11,7 +11,6 @@ const Room = require("./classes/room.js");
 window.client = client;
 
 let room = null;
-let player = null;
 
 client.socket.on("client:room:enter", serverRoom => {
 	//Create the client's room
@@ -24,29 +23,6 @@ client.socket.on("client:room:enter", serverRoom => {
 		size: serverRoom.size,
 		background: serverRoom.background
 	});
-
-	//Add server's players inside the client's room
-	for (var i = 0; i < serverRoom.players.length; i++) {
-		let player = serverRoom.players[i];
-		room.addPlayer(player.id, {
-			position: vector(player.position),
-			mouse: vector(player.mouse),
-			radius: player.radius
-		});
-	}
-
-	//Add server's bullets inside the client's room
-	for (var i = 0; i < serverRoom.bullets.length; i++) {
-		let bullet = serverRoom.bullets[i];
-		room.addBullet(bullet.id, {
-			playerId: bullet.playerId,
-			position: vector(bullet.position),
-			radius: bullet.radius
-		});
-	}
-
-	//Get this client's player
-	player = room.getPlayer(client.socket.id);
 });
 
 client.socket.on("client:room:update", serverRoom => {
@@ -169,7 +145,9 @@ client.socket.on("client:room:update", serverRoom => {
 			room.addBarrier(serverBarrier.id, {
 				position: vector(serverBarrier.position),
 				width: serverBarrier.width,
-				height: serverBarrier.height
+				height: serverBarrier.height,
+				angle: serverBarrier.angle,
+				vertices: serverBarrier.vertices
 			});
 		}
 	}
