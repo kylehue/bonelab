@@ -1,32 +1,36 @@
 const vector = require("../../../lib/vector.js");
 const config = require("../../../lib/config.js");
 const utils = require("../../../lib/utils.js");
-const shape = require("../../../lib/shape.js");
 const uuid = require("uuid");
 let closeObjects = [];
 
+const Matter = require("matter-js");
+const Body = Matter.Body;
+
 class Zombie {
-	constructor(options) {
+	constructor(body) {
+		this.body = body;
 		this.id = uuid.v4();
-		this.position = options.position;
-		this.velocity = vector();
+		this.position = vector();
 		this.angle = utils.random(-Math.PI, Math.PI);
-		this.radius = options.radius;
-		this.shape = shape.circle(this.position.x, this.position.y, this.radius);
 		this.fieldOfView = config.zombie.fieldOfView;
 		this._nearestBarrierPoint = vector();
 		this._nearestBarrierLength = vector();
 		this._positionNext = vector();
 		this.lastAngleChange = Date.now();
 		this.angleChangeDelay = 0;
-
 		this.label = "zombie";
+
+		this.radius = config.zombie.radius;
+
+		//Stats
+		this.health = 100;
 	}
 
 	addToQuadtree(quadtree) {
 		quadtree.insert({
-			x: this.position.x - this.radius,
-			y: this.position.y - this.radius,
+			x: this.body.position.x - this.radius,
+			y: this.body.position.y - this.radius,
 			width: this.radius,
 			height: this.radius,
 			self: this
@@ -35,61 +39,36 @@ class Zombie {
 
 	update(room) {
 		closeObjects = room.quadtree.retrieve({
-			x: this.position.x - this.radius,
-			y: this.position.y - this.radius,
+			x: this.body.position.x - this.radius,
+			y: this.body.position.y - this.radius,
 			width: this.radius * 2,
 			height: this.radius * 2
 		});
 
-		this.velocity.set({
+		Body.applyForce(this.body, this.body.position, {
 			x: Math.cos(this.angle) * config.zombie.speed,
 			y: Math.sin(this.angle) * config.zombie.speed
 		});
 
-		this.position.add(this.velocity);
+		this.position.set(this.body.position);
 
-		this.solveBarrierCollision();
-		this.solvePlayerCollision();
-		this.solveZombieCollision();
+		this.handleBulletCollision(room);
 		this.findTargets();
-	}
 
-	solvePlayerCollision() {
-		for(var i = 0; i < closeObjects.length; i++){
-			let object = closeObjects[i].self;
-			if (object.label !== "player") continue;
-			let distance = this.position.dist(object.position);
-			let radii = this.radius + object.radius;
-			if (distance <= radii) {
-				let overlap = distance - radii;
-				let angle = this.position.heading(object.position);
-				let displacement = {
-					x: Math.cos(angle) * overlap,
-					y: Math.sin(angle) * overlap
-				};
-
-				this.position.add(displacement)
-			}
+		if (this.health <= 0) {
+			room.removeZombie(this.id);
 		}
 	}
 
-	solveZombieCollision() {
+	handleBulletCollision(room) {
 		for(var i = 0; i < closeObjects.length; i++){
 			let object = closeObjects[i].self;
-			if (object.label !== "zombie") continue;
-			if (this === object) continue;
+			if (object.label !== "bullet") continue;
 			let distance = this.position.dist(object.position);
 			let radii = this.radius + object.radius;
-			if (distance <= radii) {
-				let overlap = distance - radii;
-				let angle = this.position.heading(object.position);
-				let displacement = {
-					x: Math.cos(angle) * (overlap / 2),
-					y: Math.sin(angle) * (overlap / 2)
-				};
-
-				this.position.add(displacement);
-				object.position.sub(displacement)
+			if (distance < this.radius) {
+				this.health -= 10;
+				room.removeBullet(object.id);
 			}
 		}
 	}
@@ -133,41 +112,10 @@ class Zombie {
 		const distance = this.position.dist(position);
 		return angle > this.angle - this.fieldOfView.angle / 2 && angle < this.angle + this.fieldOfView.angle / 2 && distance < this.fieldOfView.distance + radius;
 	}
-
-	solveBarrierCollision() {
-		this._positionNext.set(this.position.x + this.velocity.x, this.position.y + this.velocity.y);
-
-		for (var i = 0; i < closeObjects.length; i++) {
-			let object = closeObjects[i].self;
-			if (object.label !== "barrier") continue;
-
-			this._nearestBarrierPoint.set(
-				Math.max(object.position.x - object.width / 2, Math.min(this._positionNext.x, object.position.x + object.width / 2)),
-				Math.max(object.position.y - object.height / 2, Math.min(this._positionNext.y, object.position.y + object.height / 2))
-			);
-
-			this._nearestBarrierLength.set(
-				this._nearestBarrierPoint.x - this._positionNext.x,
-				this._nearestBarrierPoint.y - this._positionNext.y
-			);
-
-			let overlap = this.radius - this._nearestBarrierLength.getMag();
-
-			if (overlap >= 0) {
-				let unit = this._nearestBarrierLength.norm();
-				let speed = this.velocity.getMag();
-				this._positionNext.x = this._positionNext.x - unit.x * (overlap + speed);
-				this._positionNext.y = this._positionNext.y - unit.y * (overlap + speed);
-				if (!this.targetFound) this.angle += utils.random([-Math.PI, Math.PI]) / 2;
-			}
-		}
-
-		this.position.set(this._positionNext);
-	}
 }
 
 module.exports = {
-	create: function(options) {
-		return new Zombie(options);
+	create: function(body) {
+		return new Zombie(body);
 	}
 }

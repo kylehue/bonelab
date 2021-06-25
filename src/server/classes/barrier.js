@@ -1,14 +1,23 @@
 const uuid = require("uuid");
 const config = require("../../../lib/config.js");
-const shape = require("../../../lib/shape.js");
+const vector = require("../../../lib/vector.js");
 
+const Matter = require("matter-js");
+const Body = Matter.Body;
 class Barrier {
-	constructor(options) {
+	constructor(body) {
+		this.body = body;
 		this.id = uuid.v4();
-		this.position = options.position;
-		this.width = options.width;
-		this.height = options.height;
-		this.shape = shape.rect(this.position.x, this.position.y, this.width, this.height);
+		this.position = vector(this.body.position);
+		this.width = Math.abs(this.body.bounds.max.x - this.body.bounds.min.x);
+		this.height = Math.abs(this.body.bounds.max.y - this.body.bounds.min.y);
+		this.angle = this.body.angle;
+
+		this.vertices = [];
+		for(var i = 0; i < this.body.vertices.length; i++){
+			let vertex = this.body.vertices[i];
+			this.vertices.push(vector(vertex));
+		}
 
 		this.label = "barrier";
 	}
@@ -29,7 +38,7 @@ class Barrier {
 }
 
 module.exports = {
-	create: function(options) {
-		return new Barrier(options);
+	create: function(body) {
+		return new Barrier(body);
 	}
 }

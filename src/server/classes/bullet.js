@@ -1,5 +1,6 @@
 const uuid = require("uuid");
 const config = require("../../../lib/config.js");
+const utils = require("../../../lib/utils.js");
 
 class Bullet {
 	constructor(playerId, options) {
@@ -7,7 +8,8 @@ class Bullet {
 		this.id = uuid.v4();
 		this.position = options.position;
 		this.positionOrigin = this.position.copy();
-		this.angle = options.angle;
+		let recoil = 0.03;
+		this.angle = options.angle + utils.random(-Math.PI * recoil, Math.PI * recoil);
 		this.radius = config.bullet.radius;
 
 		this.label = "bullet";

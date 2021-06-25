@@ -1,30 +1,32 @@
 const vector = require("../../../lib/vector.js");
 const config = require("../../../lib/config.js");
 const utils = require("../../../lib/utils.js");
-const shape = require("../../../lib/shape.js");
 let closeObjects = [];
 
-class Player {
-	constructor(id, options) {
-		this.id = id;
-		this.position = options.position;
-		this.velocity = vector();
-		this.angle = options.angle;
-		this.radius = options.radius;
-		this.mouse = vector();
-		this.shape = shape.circle(this.position.x, this.position.y, this.radius);
-		this.lastShoot = Date.now();
-		this._nearestBarrierPoint = vector();
-		this._nearestBarrierLength = vector();
-		this._positionNext = vector();
+const Matter = require("matter-js");
+const Body = Matter.Body;
 
+class Player {
+	constructor(id, body) {
+		this.id = id;
+		this.body = body;
+		this.position = vector(this.body.position);
+		this.velocity = vector();
+		this.angle = this.body.angle;
+		this.radius = config.player.radius;
+		this.mouse = vector();
+		this.lastShoot = Date.now();
+		this.movingX = false;
+		this.movingY = false;
 		this.label = "player";
+		//Stats
+		this.health = 100;
 	}
 
 	addToQuadtree(quadtree) {
 		quadtree.insert({
-			x: this.position.x - this.radius,
-			y: this.position.y - this.radius,
+			x: this.body.position.x - this.radius,
+			y: this.body.position.y - this.radius,
 			width: this.radius * 2,
 			height: this.radius * 2,
 			self: this
@@ -33,74 +35,42 @@ class Player {
 
 	update(room) {
 		closeObjects = room.quadtree.retrieve({
-			x: this.position.x - this.radius,
-			y: this.position.y - this.radius,
-			width: this.radius,
-			height: this.radius
+			x: this.body.position.x - this.radius,
+			y: this.body.position.y - this.radius,
+			width: this.radius * 2,
+			height: this.radius * 2
 		});
 
-		this.solveMapBoundsCollision(room);
-		this.solveBarrierCollision();
+		Body.applyForce(this.body, this.body.position, {
+			x: this.velocity.x,
+			y: this.velocity.y
+		});
+
 		this.velocity.limit(config.player.speed);
-		this.position.add(this.velocity);
 
 		if (!this.movingX) {
-			this.velocity.x = utils.lerp(this.velocity.x, 0, 0.5);
+			this.velocity.x = utils.lerp(this.velocity.x, 0, 0.4);
 		}
 
 		if (!this.movingY) {
-			this.velocity.y = utils.lerp(this.velocity.y, 0, 0.5);
+			this.velocity.y = utils.lerp(this.velocity.y, 0, 0.4);
 		}
 
+		this.position.set(this.body.position);
 		this.movingX = false;
 		this.movingY = false;
 	}
 
-	solveBarrierCollision() {
-		this._positionNext.set(this.position.x + this.velocity.x, this.position.y + this.velocity.y);
-
-		for (var i = 0; i < closeObjects.length; i++) {
+	handleBulletCollision() {
+		for(var i = 0; i < closeObjects.length; i++){
 			let object = closeObjects[i].self;
-			if (object.label !== "barrier") continue;
-
-			this._nearestBarrierPoint.set(
-				Math.max(object.position.x - object.width / 2, Math.min(this._positionNext.x, object.position.x + object.width / 2)),
-				Math.max(object.position.y - object.height / 2, Math.min(this._positionNext.y, object.position.y + object.height / 2))
-			);
-
-			this._nearestBarrierLength.set(
-				this._nearestBarrierPoint.x - this._positionNext.x,
-				this._nearestBarrierPoint.y - this._positionNext.y
-			);
-
-			let overlap = this.radius - this._nearestBarrierLength.getMag();
-
-			if (overlap >= 0) {
-				let unit = this._nearestBarrierLength.norm();
-				let speed = this.velocity.getMag();
-				this._positionNext.x = this._positionNext.x - unit.x * (overlap + speed);
-				this._positionNext.y = this._positionNext.y - unit.y * (overlap + speed);
+			if (object.label !== "bullet") continue;
+			if (this.id === object.playerId) continue;
+			let distance = this.position.dist(object.position);
+			let radii = this.radius + object.radius;
+			if (distance <= radii) {
+				this.health -= 2;
 			}
-		}
-
-		this.position.set(this._positionNext);
-	}
-
-	solveMapBoundsCollision(room) {
-		if (this.position.x - config.map.wallWidth - this.radius <= -room.size / 2) {
-			this.position.x = -room.size / 2 + config.map.wallWidth + this.radius;
-		}
-
-		if (this.position.x + config.map.wallWidth + this.radius >= room.size / 2) {
-			this.position.x = room.size / 2 - config.map.wallWidth - this.radius;
-		}
-
-		if (this.position.y - config.map.wallWidth - this.radius <= -room.size / 2) {
-			this.position.y = -room.size / 2 + config.map.wallWidth + this.radius;
-		}
-
-		if (this.position.y + config.map.wallWidth + this.radius >= room.size / 2) {
-			this.position.y = room.size / 2 - config.map.wallWidth - this.radius;
 		}
 	}
 
@@ -129,7 +99,7 @@ class Player {
 	}
 
 	shoot(room) {
-		if (Date.now() - this.lastShoot > 60) {
+		if (Date.now() - this.lastShoot > 20) {
 			room.addBullet(this.id, {
 				position: this.position.copy(),
 				angle: this.position.heading(this.mouse)
@@ -141,7 +111,7 @@ class Player {
 }
 
 module.exports = {
-	create: function(id, options) {
-		return new Player(id, options);
+	create: function(id, body) {
+		return new Player(id, body);
 	}
 }
