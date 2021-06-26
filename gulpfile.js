@@ -11,8 +11,8 @@ const webpack = require("webpack-stream");
 const paths = {
 	client: {
 		entry: "src/client/js/app.js",
-		img: "src/client/assets/images/*.*",
-		svg: "src/client/assets/svg/*.*",
+		img: "src/client/assets/images/**/*.*",
+		svg: "src/client/assets/svg/**/*.*",
 		js: "src/client/**/*.js",
 		css: "src/client/**/*.css",
 		html: "src/client/index.html",
@@ -20,7 +20,7 @@ const paths = {
 	},
 	server: {
 		js: "src/server/**/*.js",
-		db: "src/server/database/*.db",
+		db: "src/server/**/*.db",
 		all: "src/server/**/*.*"
 	},
 	lib: {
@@ -65,7 +65,7 @@ gulp.task("client:img", function() {
 
 gulp.task("client:svg", function() {
 	return gulp.src([paths.client.svg])
-		.pipe(gulp.dest("dist/client/assets/svg"));
+		.pipe(gulp.dest("dist/client/assets/svg/"));
 });
 
 gulp.task("client:html", function() {
