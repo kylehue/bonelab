@@ -1,5 +1,6 @@
 const shape = require("../../../../lib/shape.js");
-
+const playerImg = new Image();
+playerImg.src = "assets/images/player/player.png";
 class Player {
 	constructor(id, options) {
 		this.id = id;
@@ -13,11 +14,13 @@ class Player {
 	}
 
 	render(renderer) {
-		this.shape.translate(this.position.x, this.position.y);
-		this.shape.rotate(this.angle);
-		renderer.fromVertices(this.shape.vertices, {
-			fill: "white"
-		});
+		renderer.save();
+		renderer.context.translate(this.position.x, this.position.y);
+		renderer.context.rotate(this.angle + Math.PI);
+		let size = this.radius * 0.03;
+		renderer.context.scale(size, size);
+		renderer.context.drawImage(playerImg, -playerImg.width / 2 + 15, -playerImg.height / 2);
+		renderer.restore();
 
 		/*renderer.circle(this.position.x, this.position.y, this.radius, {
 			fill: "white"

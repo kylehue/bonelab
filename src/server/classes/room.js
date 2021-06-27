@@ -34,6 +34,7 @@ class Room {
 
 		//Other properties
 		this.size = config.map.size || 500;
+		this.wallWidth = config.map.wallWidth;
 		this.background = config.map.background || "#000";
 
 		//Objects
@@ -51,21 +52,13 @@ class Room {
 		this.players = [];
 		this.zombies = [];
 		this.bullets = [];
+		this.barriers = [];
 
 		//Add walls
-		let wallWidth = 50;
-		let wallTop = Bodies.rectangle(0, -this.size / 2 + wallWidth / 2, this.size, wallWidth, config.barrier.body);
-		let wallRight = Bodies.rectangle(this.size / 2 - wallWidth / 2, 0, wallWidth, this.size, config.barrier.body);
-		let wallBottom = Bodies.rectangle(0, this.size / 2 - wallWidth / 2, this.size, wallWidth, config.barrier.body);
-		let wallLeft = Bodies.rectangle(-this.size / 2 + wallWidth / 2, 0, wallWidth, this.size, config.barrier.body);
-		this.barriers = [
-			Barrier.create(wallTop),
-			Barrier.create(wallRight),
-			Barrier.create(wallBottom),
-			Barrier.create(wallLeft)
-		];
-
-		World.add(this.world, [wallTop, wallRight, wallBottom, wallLeft]);
+		this.addBarrier(0, -this.size / 2 + this.wallWidth / 2, this.size, this.wallWidth);
+		this.addBarrier(this.size / 2 - this.wallWidth / 2, 0, this.wallWidth, this.size);
+		this.addBarrier(0, this.size / 2 - this.wallWidth / 2, this.size, this.wallWidth);
+		this.addBarrier(-this.size / 2 + this.wallWidth / 2, 0, this.wallWidth, this.size);
 
 		//Add random barriers
 		let sizeOffset = Math.pow(this.size, 0.6);
@@ -74,33 +67,50 @@ class Room {
 			let position = this.getRandomPosition();
 			let width = utils.random(config.barrier.min.width + sizeOffset / 2, config.barrier.max.width + sizeOffset);
 			let height = utils.random(config.barrier.min.height + sizeOffset / 2, config.barrier.max.height + sizeOffset);
-			let angle = utils.random(-Math.PI, Math.PI);
-			let options = config.barrier.body;
-			options.angle = angle;
-			let body = Bodies.rectangle(position.x, position.y, width, height, options);
+			let angle = utils.random(-Math.PI * 0.25, Math.PI * 0.25);
 
-			//Don't let the new barrier spawn on top of other barriers
+			this.barriers.sort((a, b) => {
+				return position.dist(b.position) - position.dist(a.position);
+			});
+
+			let closestBarrier = this.barriers[0];
+			if (closestBarrier) {
+				angle = closestBarrier.angle + Math.PI * 0.25;
+			}
+
+			let body = Bodies.rectangle(position.x, position.y, width, height, {
+				angle: angle
+			});
+
 			for (var j = 0; j < this.barriers.length; j++) {
 				let otherBarrier = this.barriers[j];
 				if (SAT.collides(body, otherBarrier.body).collided) {
 					position = this.getRandomPosition();
 					width = utils.random(config.barrier.min.width + sizeOffset / 2, config.barrier.max.width + sizeOffset);
 					height = utils.random(config.barrier.min.height + sizeOffset / 2, config.barrier.max.height + sizeOffset);
-					angle = utils.random(-Math.PI, Math.PI);
-					options = config.barrier.body;
-					options.angle = angle;
-					body = Bodies.rectangle(position.x, position.y, width, height, options);
 
-					//Safety leverage in case the new barrier gets stuck at finding its own position
-					if (Date.now() - addBarrierStart > 2000) break;
+					this.barriers.sort((a, b) => {
+						return position.dist(b.position) - position.dist(a.position);
+					});
+
+					closestBarrier = this.barriers[0];
+					if (closestBarrier) {
+						angle = closestBarrier.angle + Math.PI * 0.25;
+					}
+
+					body = Bodies.rectangle(position.x, position.y, width, height, {
+						angle: angle
+					});
 
 					j = -1;
 				}
 			}
 
-			World.add(this.world, body);
-			let newBarrier = Barrier.create(body);
-			this.barriers.push(newBarrier);
+
+			this.addBarrier(position.x, position.y, width, height, {
+				angle: angle
+			}, true);
+
 		}
 
 		//Add random zombies
@@ -152,6 +162,12 @@ class Room {
 		for (var i = 0; i < this.bullets.length; i++) {
 			let bullet = this.bullets[i];
 			bullet.update(this);
+		}
+
+		//Update barriers
+		for (var i = 0; i < this.barriers.length; i++) {
+			let barrier = this.barriers[i];
+			barrier.update(this);
 		}
 
 		this.quadtree.clear();
@@ -262,8 +278,17 @@ class Room {
 		return barrier;
 	}
 
-	addBarrier(body) {
+	addBarrier(x, y, width, height, options, mergeOptions) {
+		if (mergeOptions) {
+			options = {...config.barrier.body,
+				...options
+			};
+		} else {
+			options = options || config.barrier.body;
+		}
+		let body = Bodies.rectangle(x, y, width, height, options);
 		let barrier = Barrier.create(body);
+		World.add(this.world, body);
 		this.barriers.push(barrier);
 		return barrier;
 	}

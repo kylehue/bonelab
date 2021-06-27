@@ -1,0 +1,1 @@
+"use strict";var overlay=new Vue({el:"#overlay",data:{hidden:!0}});module.exports=overlay;

@@ -1,9 +1,11 @@
 const uuid = require("uuid");
 const config = require("../../../lib/config.js");
+const shape = require("../../../lib/shape.js");
 const vector = require("../../../lib/vector.js");
 
 const Matter = require("matter-js");
 const Body = Matter.Body;
+
 class Barrier {
 	constructor(body) {
 		this.body = body;
@@ -14,7 +16,7 @@ class Barrier {
 		this.angle = this.body.angle;
 
 		this.vertices = [];
-		for(var i = 0; i < this.body.vertices.length; i++){
+		for (var i = 0; i < this.body.vertices.length; i++) {
 			let vertex = this.body.vertices[i];
 			this.vertices.push(vector(vertex));
 		}

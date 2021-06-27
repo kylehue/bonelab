@@ -21,6 +21,7 @@ client.socket.on("client:room:enter", serverRoom => {
 		maxWave: serverRoom.maxWave,
 		currentWave: serverRoom.currentWave,
 		size: serverRoom.size,
+		wallWidth: serverRoom.wallWidth,
 		background: serverRoom.background
 	});
 });
@@ -75,11 +76,13 @@ client.socket.on("client:room:update", serverRoom => {
 			//If it exists, just update it
 			clientZombie.serverPosition.set(serverZombie.position);
 			clientZombie.radius = serverZombie.radius;
+			clientZombie.angle = serverZombie.angle;
 		} else {
 			//If it doesn't exist, add it in the client's room
 			room.addZombie(serverZombie.id, {
 				position: vector(serverZombie.position),
-				radius: serverZombie.radius
+				radius: serverZombie.radius,
+				angle: serverZombie.angle
 			});
 		}
 	}
@@ -109,10 +112,15 @@ client.socket.on("client:room:update", serverRoom => {
 			clientBullet.serverPosition.set(serverBullet.position);
 		} else {
 			//If it doesn't exist, add it in the client's room
+			let playerPosition = room.getPlayer(serverBullet.playerId).position.copy();
 			room.addBullet(serverBullet.id, {
 				playerId: serverBullet.playerId,
-				position: room.getPlayer(serverBullet.playerId).position.copy(),
-				radius: serverBullet.radius
+				position: vector({
+					x: playerPosition.x + Math.cos(serverBullet.angle + 0.17) * 22,
+					y: playerPosition.y + Math.sin(serverBullet.angle + 0.17) * 22
+				}),
+				radius: serverBullet.radius,
+				angle: serverBullet.angle
 			});
 		}
 	}
@@ -139,7 +147,7 @@ client.socket.on("client:room:update", serverRoom => {
 		let clientBarrier = room.getBarrier(serverBarrier.id);
 		if (clientBarrier) {
 			//If it exists, just update it
-			//clientBarrier.serverPosition.set(serverBarrier.position);
+			
 		} else {
 			//If it doesn't exist, add it in the client's room
 			room.addBarrier(serverBarrier.id, {
@@ -151,7 +159,6 @@ client.socket.on("client:room:update", serverRoom => {
 			});
 		}
 	}
-
 });
 
 renderer.fullscreen();

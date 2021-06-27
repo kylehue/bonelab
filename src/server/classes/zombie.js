@@ -55,13 +55,24 @@ class Zombie {
 		this.handleBulletCollision(room);
 		this.findTargets();
 
+		for (var i = 0; i < closeObjects.length; i++) {
+			let object = closeObjects[i].self;
+			if (object.label === "barrier") {
+				if (!this.targetFound) {
+					if (Matter.SAT.collides(this.body, object.body).collided) {
+						this.angle += utils.random([-Math.PI, Math.PI]) * Math.random();
+					}
+				}
+			}
+		}
+
 		if (this.health <= 0) {
 			room.removeZombie(this.id);
 		}
 	}
 
 	handleBulletCollision(room) {
-		for(var i = 0; i < closeObjects.length; i++){
+		for (var i = 0; i < closeObjects.length; i++) {
 			let object = closeObjects[i].self;
 			if (object.label !== "bullet") continue;
 			let distance = this.position.dist(object.position);
@@ -81,13 +92,14 @@ class Zombie {
 			let object = closeObjects[i].self;
 			if (object.label !== "player") continue;
 			let distance = this.position.dist(object.position);
-			if (distance <= this.fieldOfView.distance /*&& this.sees(object.position)*/) {
+			if (distance <= this.fieldOfView.distance /*&& this.sees(object.position)*/ ) {
 				this.angle = this.position.heading(object.position);
 				this.targetFound = true;
 			}
 		}
 
-		/*if (!this.targetFound) */this.randomizeAngle();
+		/*if (!this.targetFound) */
+		this.randomizeAngle();
 	}
 
 	randomizeAngle() {

@@ -11,7 +11,7 @@ class Barrier {
 
 	render(renderer) {
 		renderer.fromVertices(this.vertices, {
-			fill: "#222"
+			fill: "#191b1e"
 		});
 	}
 

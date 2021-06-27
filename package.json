@@ -4,7 +4,8 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "gulp run"
+    "start": "node dist/server/server.js",
+    "postinstall": "gulp build"
   },
   "author": "kylehue",
   "license": "ISC",

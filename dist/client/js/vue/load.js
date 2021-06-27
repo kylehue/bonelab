@@ -1,0 +1,1 @@
+"use strict";var loadApp=new Vue({el:"#loadScreen",data:{hidden:!0}});module.exports=loadApp;

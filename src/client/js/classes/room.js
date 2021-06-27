@@ -2,7 +2,7 @@ const client = require("./../client.js");
 const vector = require("../../../../lib/vector.js");
 const config = require("../../../../lib/config.js");
 const utils = require("../../../../lib/utils.js");
-const Ray = require("../../../../lib/ray.js");
+const Ray = require("../../lib/ray.js");
 const Player = require("./player.js");
 const Zombie = require("./zombie.js");
 const Bullet = require("./bullet.js");
@@ -14,16 +14,17 @@ class Room {
 
 		//Important properties
 		this.id = id;
-		this.index = options.index || -1;
-		this.description = options.description || "";
-		this.password = options.password || "";
-		this.maxWave = options.maxWave || -1;
-		this.currentWave = options.currentWave || -1;
+		this.index = options.index;
+		this.description = options.description;
+		this.password = options.password;
+		this.maxWave = options.maxWave;
+		this.currentWave = options.currentWave;
 
 		//Other properties
-		this.size = options.size || -1;
-		this.background = options.background || "";
-		this.shadowColor = "#28262a";
+		this.size = options.size;
+		this.wallWidth = options.wallWidth;
+		this.background = options.background;
+		this.shadowColor = "#28252b";
 
 		//Objects
 		this.localPlayer = null;
@@ -32,6 +33,12 @@ class Room {
 		this.bullets = [];
 		this.barriers = [];
 		this.sight = Ray.create();
+
+		//Fix corner shadows
+		this.sight.addBarrier(-this.size / 2 + this.wallWidth, -this.size / 2 + this.wallWidth, this.size / 2 - this.wallWidth, -this.size / 2 + this.wallWidth);
+		this.sight.addBarrier(this.size / 2 - this.wallWidth, -this.size / 2 + this.wallWidth, this.size / 2 - this.wallWidth, this.size / 2 - this.wallWidth);
+		this.sight.addBarrier(this.size / 2 - this.wallWidth, this.size / 2 - this.wallWidth, -this.size / 2 + this.wallWidth, this.size / 2 - this.wallWidth);
+		this.sight.addBarrier(-this.size / 2 + this.wallWidth, this.size / 2 - this.wallWidth, -this.size / 2 + this.wallWidth, -this.size / 2 + this.wallWidth);
 	}
 
 	render(renderer) {
@@ -47,9 +54,9 @@ class Room {
 		}
 
 		let sight = this.sight.getShape();
-		for(var i = 0; i < sight.length; i++){
+		for (var i = 0; i < sight.length; i++) {
 			let castA = sight[i];
-			for(var j = 0; j < sight.length; j++){
+			for (var j = 0; j < sight.length; j++) {
 				let castB = sight[j];
 				if (castA === castB) continue;
 				let offset = 1;
@@ -64,11 +71,18 @@ class Room {
 
 		//Draw the line of sight
 		renderer.fromVertices(sight, {
-			fill: this.background
+			fill: this.background,
+			close: true
 		});
 
 		renderer.clip();
 
+		//Draw the bullets
+		for (var i = 0; i < this.bullets.length; i++) {
+			let bullet = this.bullets[i];
+			if (renderer.camera.sees(bullet.position.x, bullet.position.y, bullet.radius, bullet.radius)) bullet.render(renderer);
+		}
+		
 		//Draw the players
 		for (var i = 0; i < this.players.length; i++) {
 			let player = this.players[i];
@@ -79,12 +93,6 @@ class Room {
 		for (var i = 0; i < this.zombies.length; i++) {
 			let zombie = this.zombies[i];
 			if (renderer.camera.sees(zombie.position.x, zombie.position.y, zombie.radius, zombie.radius)) zombie.render(renderer);
-		}
-
-		//Draw the bullets
-		for (var i = 0; i < this.bullets.length; i++) {
-			let bullet = this.bullets[i];
-			if (renderer.camera.sees(bullet.position.x, bullet.position.y, bullet.radius, bullet.radius)) bullet.render(renderer);
 		}
 
 		renderer.restore();
@@ -181,9 +189,9 @@ class Room {
 	addBarrier(id, options) {
 		let barrier = Barrier.create(id, options);
 
-		for (var i = 0; i < barrier.shape.vertices.length; i++) {
-			let vertex = barrier.shape.vertices[i];
-			let nextVertex = barrier.shape.vertices[i + 1 == barrier.shape.vertices.length ? 0 : i + 1];
+		for (var i = 0; i < barrier.vertices.length; i++) {
+			let vertex = barrier.vertices[i];
+			let nextVertex = barrier.vertices[i + 1 == barrier.vertices.length ? 0 : i + 1];
 			this.sight.addBarrier(vertex.x, vertex.y, nextVertex.x, nextVertex.y);
 		}
 

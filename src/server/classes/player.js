@@ -100,9 +100,13 @@ class Player {
 
 	shoot(room) {
 		if (Date.now() - this.lastShoot > 20) {
+			let angle = this.position.heading(this.mouse);
 			room.addBullet(this.id, {
-				position: this.position.copy(),
-				angle: this.position.heading(this.mouse)
+				position: vector({
+					x: this.position.x + Math.cos(angle + 0.17) * 22,
+					y: this.position.y + Math.sin(angle + 0.17) * 22
+				}),
+				angle: angle
 			});
 
 			this.lastShoot = Date.now();

@@ -37,6 +37,7 @@ function parseRoom(room, options) {
 		maxWave: room.maxWave,
 		currentWave: room.currentWave,
 		size: room.size,
+		wallWidth: room.wallWidth,
 		background: room.background,
 		playerCount: room.players.length
 	};
@@ -80,7 +81,8 @@ function parseRoom(room, options) {
 				id: bullet.id,
 				playerId: bullet.playerId,
 				position: bullet.position,
-				radius: bullet.radius
+				radius: bullet.radius,
+				angle: bullet.angle
 			});
 		}
 
@@ -347,6 +349,7 @@ io.on("connection", socket => {
 });
 
 function updateClient() {
+	//Only send the near objects?
 	for (var i = 0; i < game.rooms.length; i++) {
 		let room = game.rooms[i];
 		io.in(room.id).emit("client:room:update", parseRoom(room, {
