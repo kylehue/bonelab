@@ -15,7 +15,7 @@ const database = require("./database.js");
 //Handle game
 const config = require("../../lib/config.js");
 const game = require("./classes/game.js");
-let eventLogs = true;
+let eventLogs = false;
 
 function toggleOffline(id, value) {
 	database.in("users").update({

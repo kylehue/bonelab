@@ -1,5 +1,6 @@
 const Datastore = require("nedb");
 const fs = require("fs");
+const path = require("path");
 
 class Database {
 	constructor() {
@@ -8,7 +9,7 @@ class Database {
 	}
 
 	loadTables() {
-		let files = fs.readdirSync("./server/database");
+		let files = fs.readdirSync(path.join(__dirname, "database"));
 		for (var i = 0; i < files.length; i++) {
 			let name = files[i].split(".db")[0];
 			let added = this.tables.find(tb => tb.name == name);
